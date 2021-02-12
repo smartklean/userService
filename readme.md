@@ -4,7 +4,7 @@
 
 This will create a dockerized stack for our Users Service [Lumen](https://lumen.laravel.com) application, consisted of the following containers:
 
--  **app**, your PHP application container
+-  **app**, PHP application container
 
         Nginx, PHP7.4 PHP7.4-fpm, Composer, NPM, Node.js v10.x
 
