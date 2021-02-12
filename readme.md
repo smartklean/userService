@@ -55,23 +55,21 @@ This will create a dockerized stack for our Users Service [Lumen](https://lumen.
 
     **N.B:** By default, the app container is mapped to port 80, if some other application on your local machine is using port 80, you can either free it up or edit the port settings for the app container in the `docker-composer.yml` file **before** you run `docker-compose up -d`. The same is true for the mysql and phpmyadmin containers which are mapped to ports 3306 and 8080 respectively.
 
-4. After the whole stack is up, enter the app container:
+5. After the whole stack is up, enter the app container:
 
     ```
     $ docker exec -it [app_container_name] bash
     ```
     Replace `app_container_name` with the name of your app container (if you did not change the default settings in your `docker-compose.yml` file, your app container name should be `users_app_container`).
 
-5. Copy .env.example to .env:
+6. Copy .env.example to .env:
 
     ```
     $ cp .env.example .env
     ```
 
-6. In the `.env` file, you need to assign a value to APP_KEY and also update the db credentials to reflect what you have in your `docker-compose.yml` file.
+7. In the `.env` file, you need to assign a value to APP_KEY and also update the db credentials to reflect what you have in your `docker-compose.yml` file. Ideally, you'd want a 32-character long unique string as your app key. Laravel allows you to easily generate an app key with `php artisan key:generate` command but Lumen being extremely light weight doesn't come with a lot of artisan commands, so you're going to have to [do this manually](http://www.unit-conversion.info/texttools/random-string-generator/).
 
-Ideally, you'd want a 32-character long unique string as your app key. Laravel allows you to easily generate an app key with `php artisan key:generate` command but Lumen being extremely light weight doesn't come with a lot of artisan commands so you're going to have to [http://www.unit-conversion.info/texttools/random-string-generator/](do this manually).
+8. In your terminal, run `php artisan migrate --seed` to migrate existing tables to your database.
 
-7. In your terminal, run `php artisan migrate --seed` to migrate existing tables to your database.
-
-8. That's it! Navigate to [http://localhost](http://localhost) to access the application.
+9. That's it! Navigate to [http://localhost](http://localhost) to access the application.
