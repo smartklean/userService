@@ -16,8 +16,8 @@
 $router->get('/', function() {
     return response()->json([
       'status' => true,
-      'message' => 'Hello World!'
-    ]);
+      'message' => 'Welcome to CashEnvoy!'
+    ], 200);
 });
 
 $router->group([
