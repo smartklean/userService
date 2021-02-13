@@ -26,6 +26,10 @@ $router->group([
   $router->group([
     'prefix' => 'users'
   ], function() use ($router) {
-    $router->post('/create', 'UsersController@create');
+    $router->get('/get[/{limit}]', 'UsersController@fetch');
+    $router->get('/{id}/get', 'UsersController@fetchSingle');
+    $router->put('/{id}/update', 'UsersController@update');
+    $router->post('/create', 'UsersController@store');
+    $router->delete('/{id}/delete', 'UsersController@destroy');
   });
 });

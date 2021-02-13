@@ -47,10 +47,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
       return $this->attributes['last_name'] = strtolower(trim($value));
     }
 
-    public function getEmailAttribute($value){
-      return ucwords($value);
-    }
-
     public function setEmailAttribute($value){
       return $this->attributes['email'] = strtolower(trim($value));
     }

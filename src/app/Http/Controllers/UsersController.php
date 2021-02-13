@@ -18,7 +18,37 @@ class UsersController extends Controller
 
     //
 
-    public function create(Request $request){
+    public function fetch($limit = null){
+      if(!$limit)
+        $users = User::all();
+      else
+        $users = User::paginate($limit);
+
+      return UserResource::collection($users)
+              ->additional([
+                'status' => true,
+                'message' => 'Success'
+              ], 200);
+    }
+
+    public function fetchSingle($id){
+      $user = User::find($id);
+
+      if(!$user){
+        return response()->json([
+          'status' => false,
+          'message' => 'User could not be found'
+        ], 400);
+      }
+
+      return (new UserResource($user))
+            ->additional([
+              'status' => true,
+              'message' => 'User added successfully'
+            ], 200);
+    }
+
+    public function store(Request $request){
       $rules = [
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -52,7 +82,73 @@ class UsersController extends Controller
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => 'User added successfully.'
-            ]);
+              'message' => 'User added successfully'
+            ], 200);
+    }
+
+    public function update(Request $request, $id){
+      $user = User::find($id);
+
+      if(!$user){
+        return response()->json([
+          'status' => false,
+          'message' => 'User could not be found'
+        ], 400);
+      }
+
+      $rules = [
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+        'phone_number' => 'required|string|max:255|unique:users,phone_number,'.$user->id,
+        'is_developer' => 'nullable|boolean',
+      ];
+
+      $validator =  Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return response()->json([
+          'status' => false,
+          'message' => 'Validation error occured.',
+          'data' => [
+            'errors' => $validator->getMessageBag()->toArray()
+          ]
+        ], 409);
+      }
+
+      $user->fill([
+        'first_name' => $request->input('first_name'),
+        'last_name' => $request->input('last_name'),
+        'email' => $request->input('email'),
+        'phone_number' => $request->input('phone_number'),
+        'is_developer' => $request->input('is_developer') !== null ? true : false,
+      ])->save();
+
+      return (new UserResource($user))
+            ->additional([
+              'status' => true,
+              'message' => 'User updated successfully'
+            ], 200);
+    }
+
+    public function destroy($id){
+      $user = User::find($id);
+
+      $old = $user;
+
+      if(!$user){
+        return response()->json([
+          'status' => false,
+          'message' => 'User could not be found'
+        ], 400);
+      }
+
+      $user->delete();
+
+      return (new UserResource($old))
+            ->additional([
+              'status' => true,
+              'message' => 'User deleted successfully'
+            ], 200);
     }
 }
