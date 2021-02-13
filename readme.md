@@ -62,14 +62,16 @@ This will create a dockerized stack for our Users Service [Lumen](https://lumen.
     ```
     Replace `app_container_name` with the name of your app container (if you did not change the default settings in your `docker-compose.yml` file, your app container name should be `users_app_container`).
 
-6. Copy .env.example to .env:
+6. Run `$ composer update` to install all your app dependencies.
+
+7. Copy .env.example to .env:
 
     ```
     $ cp .env.example .env
     ```
 
-7. In the `.env` file, you need to assign a value to **APP_KEY** and also update the database environment variables (prefixed with **DB_**) to reflect the MySQL credentials in your `docker-compose.yml` file. Ideally, you'd want a 32-character long unique string as your app key. Laravel allows you to easily generate an app key with `php artisan key:generate` command but Lumen being extremely light weight doesn't come with a lot of artisan commands, so you're going to have to [do this manually](http://www.unit-conversion.info/texttools/random-string-generator/).
+8. In the `.env` file, you need to assign a value to **APP_KEY** and also update the database environment variables (prefixed with **DB_**) to reflect the MySQL credentials in your `docker-compose.yml` file. Ideally, you'd want a 32-character long unique string as your app key. Laravel allows you to easily generate an app key with `php artisan key:generate` command but Lumen being extremely light weight doesn't come with a lot of artisan commands, so you're going to have to [do this manually](http://www.unit-conversion.info/texttools/random-string-generator/).
 
-8. In your terminal, run `php artisan migrate --seed` to migrate existing tables to your database.
+9. In your terminal, run `php artisan migrate --seed` to migrate existing tables to your database.
 
-9. That's it! Connect to [http://localhost](http://localhost) on your browser or via Postman. The endpoint should return a 'Welcome to CashEnvoy!' message as part of a JSON response object.
+10. That's it! Connect to [http://localhost](http://localhost) on your browser or via Postman. The endpoint should return a 'Welcome to CashEnvoy!' message as part of a JSON response object.
