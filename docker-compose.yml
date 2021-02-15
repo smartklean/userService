@@ -1,33 +1,6 @@
 version: '3.7'
 
 services:
-  mysql:  
-    image: mysql:5.7
-    container_name: users_mysql_container
-    hostname: mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
-      - MYSQL_DATABASE=usersdb
-      - MYSQL_USER=cashenvoy
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-    restart: unless-stopped
-    ports:
-      - 127.0.0.1:3306:3306
-    volumes:
-      - mysql-data:/var/lib/mysql
-    secrets:
-      - db_root_password
-      - db_password
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    restart: always
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: root
-      PMA_PASSWORD: 4553BF6E2AAA5BC2173F3844804C16F4
-    ports:
-      - "8080:80"
 
   app:
     build: .
@@ -37,18 +10,8 @@ services:
     volumes:
       - ./src:/var/www/html
     ports:
-      - "80:80"
-    depends_on:
-      - mysql
-
-secrets:
-  db_root_password:
-    file: db_root_password.txt
-  db_password:
-    file: db_password.txt
-
-volumes:
-  mysql-data:
+      - 8080:80
+      - 3306:3306
 
 networks:
   default:
