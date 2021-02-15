@@ -75,9 +75,15 @@ ADD resources/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #------------- Container Config ---------------------------------------------------------------
 
-# Expose port 80
-EXPOSE 80
+# Expose port 443
+EXPOSE 443
 
 # Set supervisor to manage container processes
 ENTRYPOINT ["/usr/bin/supervisord"]
 
+# Bundle web service source 
+COPY src /var/www/html
+
+# Install app dependencies
+RUN cd /var/www/html && \
+    composer install --no-interaction 
