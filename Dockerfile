@@ -80,3 +80,9 @@ EXPOSE 80
 
 # Set supervisor to manage container processes
 ENTRYPOINT ["/usr/bin/supervisord"]
+
+# Copy source folder into web root
+COPY src /var/www/html
+
+# Update dependencies
+RUN composer update
