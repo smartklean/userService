@@ -20,7 +20,7 @@ $router->get('/', function() {
     ], 200);
 });
 
-$router->get('/health_check', function() {
+$router->get('/health', function() {
     return response()->json([
       'status' => true,
     ], 200);
