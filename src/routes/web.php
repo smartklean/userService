@@ -20,6 +20,12 @@ $router->get('/', function() {
     ], 200);
 });
 
+$router->get('/health_check', function() {
+    return response()->json([
+      'status' => true,
+    ], 200);
+});
+
 $router->group([
   'prefix' => 'api',
 ], function() use ($router) {
