@@ -81,6 +81,8 @@ EXPOSE 80
 # Set supervisor to manage container processes
 ENTRYPOINT ["/usr/bin/supervisord"]
 
+#------------- Container Config - Extras for non local environment -------------------------
+
 # Bundle web service source 
 COPY src /var/www/html
 
