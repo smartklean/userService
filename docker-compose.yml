@@ -10,7 +10,8 @@ services:
     volumes:
       - ./src:/var/www/html
     ports:
-      - 8080:80
+      - 8000:80
+    extra_hosts:
       - 3306:3306
 
 networks:
