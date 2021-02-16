@@ -10,8 +10,7 @@ services:
     volumes:
       - ./src:/var/www/html
     ports:
-      - 8001:80
-      - 3306:3306
+      - 8000:80
 
 networks:
   default:
