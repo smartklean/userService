@@ -4,13 +4,13 @@ services:
 
   app:
     build: .
-    container_name: users_app_container
+    container_name: UsersWS
     hostname: app
     restart: unless-stopped
     volumes:
       - ./src:/var/www/html
     ports:
-      - 8000:80
+      - 8001:80
       - 3306:3306
 
 networks:
