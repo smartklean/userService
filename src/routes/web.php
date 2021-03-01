@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Request;
+
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -14,6 +16,16 @@
 */
 
 $router->get('/', function() {
+    if(config('app.env') != "production"){
+      return response()->json([
+        'status' => true,
+        'data' => [
+          'key' => Illuminate\Support\Str::random(32),
+        ],
+        'message' => 'Welcome to CashEnvoy!'
+      ], 200);
+    }
+
     return response()->json([
       'status' => true,
       'message' => 'Welcome to CashEnvoy!'
@@ -29,6 +41,13 @@ $router->get('/health', function() {
 $router->group([
   'prefix' => 'api',
 ], function() use ($router) {
+  $router->get('/token/validate', ['middleware' => 'auth:api', function(){
+    return response()->json([
+      'status' => true,
+      'message' => 'Token authenticated.'
+    ], 200);
+  }]);
+
   $router->group([
     'prefix' => 'users'
   ], function() use ($router) {
@@ -36,6 +55,7 @@ $router->group([
     $router->get('/{id}/get', 'UsersController@fetchSingle');
     $router->put('/{id}/update', 'UsersController@update');
     $router->post('/create', 'UsersController@store');
+    $router->post('/authenticate', 'UsersController@authenticate');
     $router->delete('/{id}/delete', 'UsersController@destroy');
   });
 });

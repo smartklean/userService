@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
@@ -67,7 +69,7 @@ class UsersController extends Controller
           'data' => [
             'errors' => $validator->getMessageBag()->toArray()
           ]
-        ], 409);
+        ], 400);
       }
 
       $user = User::create([
@@ -83,6 +85,54 @@ class UsersController extends Controller
             ->additional([
               'status' => true,
               'message' => 'User added successfully'
+            ], 200);
+    }
+
+    public function authenticate(Request $request){
+      $rules = [
+        'password' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255'
+      ];
+
+      $validator =  Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return response()->json([
+          'status' => false,
+          'message' => 'Validation error occured.',
+          'data' => [
+            'errors' => $validator->getMessageBag()->toArray()
+          ]
+        ], 400);
+      }
+
+      $user = User::where('email', $request->input('email'))->first();
+
+      if($user)
+        $passwordIsValid = Hash::check($request->input('password'), $user->password);
+      else
+        $passwordIsValid = false;
+
+      if(!$user || !$passwordIsValid){
+        return response()->json([
+          'status' => false,
+          'message' => 'Unauthenticated.'
+        ], 200);
+      }
+
+      $tokenGen = $user->createToken('Personal Access Token');
+
+      $token = $tokenGen->token;
+
+      if($request->remember) $token->expires_at = Carbon::now()->addWeeks(1);
+
+      $token->save();
+
+      return (new UserResource($user))
+            ->additional([
+              'status' => true,
+              'message' => 'Authenticated.',
+              'token' => $tokenGen->accessToken
             ], 200);
     }
 
@@ -113,7 +163,7 @@ class UsersController extends Controller
           'data' => [
             'errors' => $validator->getMessageBag()->toArray()
           ]
-        ], 409);
+        ], 400);
       }
 
       $user->fill([
