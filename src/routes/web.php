@@ -41,21 +41,27 @@ $router->get('/health', function() {
 $router->group([
   'prefix' => 'api',
 ], function() use ($router) {
-  $router->get('/token/validate', ['middleware' => 'auth:api', function(){
-    return response()->json([
-      'status' => true,
-      'message' => 'Token authenticated.'
-    ], 200);
-  }]);
-
+  /* Version 1 */
   $router->group([
-    'prefix' => 'users'
+    'prefix' => 'v1'
   ], function() use ($router) {
-    $router->get('/get[/{limit}]', 'UsersController@fetch');
-    $router->get('/{id}/get', 'UsersController@fetchSingle');
-    $router->put('/{id}/update', 'UsersController@update');
-    $router->post('/create', 'UsersController@store');
-    $router->post('/authenticate', 'UsersController@authenticate');
-    $router->delete('/{id}/delete', 'UsersController@destroy');
+    $router->get('/token/validate', ['middleware' => 'auth:api', function(){
+      return response()->json([
+        'status' => true,
+        'message' => 'Token authenticated.'
+      ], 200);
+    }]);
+
+    $router->group([
+      'prefix' => 'users'
+    ], function() use ($router) {
+      $router->get('/get[/{limit}]', 'Apis\v1\UsersController@fetch');
+      $router->get('/{id}/get', 'Apis\v1\UsersController@fetchSingle');
+      $router->put('/{id}/update', 'Apis\v1\UsersController@update');
+      $router->post('/create', 'Apis\v1\UsersController@store');
+      $router->post('/authenticate', 'Apis\v1\UsersController@authenticate');
+      $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
+    });
   });
+  /* Version 1 */
 });

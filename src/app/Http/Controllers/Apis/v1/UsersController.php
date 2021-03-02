@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Apis\v1;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class UsersController extends Controller
 {
@@ -17,8 +18,6 @@ class UsersController extends Controller
      *
      * @return void
      */
-
-    //
 
     public function fetch($limit = null){
       if(!$limit)
