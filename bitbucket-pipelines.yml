@@ -25,7 +25,13 @@ definitions:
         name: Check the Quality Gate on SonarCloud
         script:
           - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
-              
+    - step: &checkout-deploy-kit
+        name: Check out Deploy-Kit repo
+        script:
+          - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
+          - cd deploy-kit
+          - ls -latr
+
 pipelines:
   default:
     - step:
@@ -34,10 +40,11 @@ pipelines:
   
   branches:
     master:
-      - step: *build-test-sonarcloud
-      - step: *check-quality-gate-sonarcloud
+      #- step: *build-test-sonarcloud
+      #- step: *check-quality-gate-sonarcloud
+      - step: *checkout-deploy-kit
     
   pull-requests:
     '**':
-      - step: *build-test-sonarcloud
-      - step: *check-quality-gate-sonarcloud
+      #- step: *build-test-sonarcloud
+      #- step: *check-quality-gate-sonarcloud
