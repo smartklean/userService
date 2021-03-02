@@ -31,7 +31,12 @@ definitions:
           - apt-get update && apt-get install -y git && git --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
           - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
-
+    - step: &deploy-to-staging
+        name: Deploy to Staging
+        script:
+          - echo "Deploying to Staging Env"
+          - ./appws_deploy.sh Staging Webservice
+          
 pipelines:
   default:
     - step:
@@ -43,7 +48,7 @@ pipelines:
       #- step: *build-test-sonarcloud
       #- step: *check-quality-gate-sonarcloud
       - step: *checkout-deploy-kit
-    
+      - step: *deploy-to-staging
   pull-requests:
     '**':
       #- step: *build-test-sonarcloud
