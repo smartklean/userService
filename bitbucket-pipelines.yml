@@ -28,6 +28,8 @@ definitions:
     - step: &checkout-deploy-kit
         name: Check out Deploy-Kit repo
         script:
+          - apt-get update && apt-get install -y git
+          - git --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
           - cd deploy-kit
           - ls -latr
