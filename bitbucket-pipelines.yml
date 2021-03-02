@@ -30,7 +30,7 @@ definitions:
         script:
           - apt-get update && apt-get install -y git && git --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
-          - cd deploy-kit && cp * ../ && cd .. && ls -latr
+          - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
 
 pipelines:
   default:
