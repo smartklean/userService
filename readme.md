@@ -1,51 +1,42 @@
-# Users Service Docker Scaffold
+# Service Docker Scaffold
 
 ### **Description**
 
-This will create a dockerized stack for our Users Service [Lumen](https://lumen.laravel.com) application, consisted of the following containers:
+This will create a dockerized stack for our service, made up of one container that houses the images (Nginx, PHP7.4 PHP7.4-fpm, Composer, NPM, Node.js v10.x) needed to run our Lumen application.
 
--  **app**, PHP application container
+In the `docker-compse.yml` file, the container name is set to ServiceScaffold. You should change this
 
-        Nginx, PHP7.4 PHP7.4-fpm, Composer, NPM, Node.js v10.x
-
--  **mysql**, MySQL database container ([MySQL](https://hub.docker.com/_/mysql/) Official Docker Image)
-
-- **phpmyadmin**, phpMyAdmin container ([phpMyAdmin](https://hub.docker.com/_/phpmyadmin/) Official Docker Image)
-
-#### **Directory Structure**
+### **Directory Structure**
 ```
-+-- src <project root>
++-- .git
 +-- resources
 |   +-- default
 |   +-- nginx.conf
 |   +-- supervisord.conf
 |   +-- www.conf
++-- src <project root>
 +-- .gitignore
-+-- Dockerfile
 +-- docker-compose.yml
++-- Dockerfile
++-- Dockerfile.nonlocal
 +-- readme.md <this file>
 ```
 
-### **Setup instructions**
+### **Prerequisites**
 
-**Prerequisites:**
+Depending on your OS, the appropriate version of Docker Community Edition has to be installed on your machine.  ([Download Docker Community Edition](https://hub.docker.com/search/?type=edition&offering=community))
 
-* Depending on your OS, the appropriate version of Docker Community Edition has to be installed on your machine.  ([Download Docker Community Edition](https://hub.docker.com/search/?type=edition&offering=community))
+### **How To Install**
 
-**Installation Steps:**
+1. Create a new directory in which your OS user has full read/write access and clone this repository inside. Clone using your app password.
 
-1. Create a new directory in which your OS user has full read/write access and clone this repository inside.
+2. Open a new terminal/CMD, navigate to this repository root (where `docker-compose.yml` exists).
 
-2. Create two new textfiles named `db_root_password.txt` and `db_password.txt` and place your preferred database passwords inside:
+3. Update the remote upstream to point to your repo using: `git remote set-url origin <repo_url>`.
 
-    ```
-    $ echo "myrootpass" > db_root_password.txt
-    $ echo "myuserpass" > db_password.txt
-    ```
+4. Update the values of services.app.container_name and services.app.ports as required. **N.B:** Remember to branch off master before making edits to the source code.
 
-3. Copy the content of your `db_root_password.txt` file and use it to update the value of phpmyadmin.environment.PMA_PASSWORD in the `docker-compose.yml` file.
-
-4. Open a new terminal/CMD, navigate to this repository root (where `docker-compose.yml` exists) and execute the following command:
+5. Execute the following command:
 
     ```
     $ docker-compose up -d
@@ -53,25 +44,25 @@ This will create a dockerized stack for our Users Service [Lumen](https://lumen.
 
     This will download/build all the required images and start the stack containers. It usually takes a bit of time, so grab a cup of coffee.
 
-    **N.B:** By default, the app container is mapped to port 80, if some other application on your local machine is using port 80, you can either free it up or edit the port settings for the app container in the `docker-composer.yml` file **before** you run `docker-compose up -d`. The same is true for the mysql and phpmyadmin containers which are mapped to ports 3306 and 8080 respectively.
-
-5. After the whole stack is up, enter the app container:
+6. After the whole stack is up, ssh into the app container by running the following command:
 
     ```
     $ docker exec -it [app_container_name] bash
     ```
-    Replace `app_container_name` with the name of your app container (if you did not change the default settings in your `docker-compose.yml` file, your app container name should be `users_app_container`).
+    Replace `app_container_name` with the name of your app container. If successful, the command would open up an interactive shell in the /var/www/html folder.
 
-6. Run `$ composer update` to install all your app dependencies.
+7. In that shell, run `$ composer update` to install all your Lumen dependencies.
 
-7. Copy .env.example to .env:
+8. Copy .env.example to .env:
 
     ```
     $ cp .env.example .env
     ```
 
-8. In the `.env` file, you need to assign a value to **APP_KEY** and also update the database environment variables (prefixed with **DB_**) to reflect the MySQL credentials in your `docker-compose.yml` file. Ideally, you'd want a 32-character long unique string as your app key. Laravel allows you to easily generate an app key with `php artisan key:generate` command but Lumen being extremely light weight doesn't come with a lot of artisan commands, so you're going to have to [do this manually](http://www.unit-conversion.info/texttools/random-string-generator/).
+9. In the `.env` file, you need to assign a value to **APP_KEY**. Laravel allows you to easily generate an app key with `php artisan key:generate` command but Lumen being extremely light weight doesn't come with a lot of artisan commands, so you're going to have to [do this manually](http://www.unit-conversion.info/texttools/random-string-generator/).
 
-9. In your terminal, run `php artisan migrate --seed` to migrate existing tables to your database.
+10. Ensure that you have a MySQL server instance running on your local machine. Enter the MySQL connection values into your `.env` file. The host should be set to host.docker.internal.
 
-10. That's it! Connect to [http://localhost](http://localhost) on your browser or via Postman. The endpoint should return a 'Welcome to CashEnvoy!' message as part of a JSON response object.
+11. In your terminal, run `php artisan migrate --seed` to migrate existing tables to your database.
+
+12. That's it! Connect to [http://localhost:your_app_port](http://localhost:your_app_port) on your browser or via Postman. The endpoint should return a 'Welcome to CashEnvoy!' message as part of a JSON response object.
