@@ -9,7 +9,13 @@ FROM ubuntu:18.04
 
 # Install common tools
 RUN apt-get update
-RUN apt-get install -y wget curl nano htop git unzip bzip2 software-properties-common locales
+RUN apt-get install -y wget curl vim nano inetutils-ping htop git unzip bzip2 software-properties-common locales
+
+# Install SSH
+RUN apt-get update \
+    && apt-get install -y openssh-server \
+    && mkdir -p /var/run/sshd
+
 
 # Set evn var to enable xterm terminal
 ENV TERM=xterm
@@ -73,10 +79,15 @@ RUN apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
 ADD resources/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# ------------- Add a startup script ----------------------------------------------------
+
+COPY docker-ssh-setup.sh /usr/local/bin/docker-ssh-setup.sh
+RUN chmod +x /usr/local/bin/docker-ssh-setup.sh
+
 #------------- Container Config ---------------------------------------------------------------
 
-# Expose port 80
-EXPOSE 80
+# Expose port 22 & 80
+EXPOSE 22 80
 
 # Set supervisor to manage container processes
 ENTRYPOINT ["/usr/bin/supervisord"]
@@ -89,3 +100,15 @@ COPY src /var/www/html
 # Install app dependencies
 RUN cd /var/www/html && \
     composer install --no-interaction 
+
+#------------- Container Config - Aliasing the nginx logs to stdout and stderr--------------
+
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+#------------- Container Config - Ownership & Log and cache folders writable --------------
+
+RUN chown -R www-data:www-data /var/www/html/
+RUN chmod -R 755 /var/www/html/storage 
+RUN chmod -R 755 /var/www/html/bootstrap/cache || echo ""
+

@@ -81,3 +81,8 @@ EXPOSE 80
 # Set supervisor to manage container processes
 ENTRYPOINT ["/usr/bin/supervisord"]
 
+#------------- Container Config - Ownership & Log and cache folders writable --------------
+
+RUN chown -R www-data:www-data /var/www/html/
+RUN chmod -R 755 /var/www/html/storage 
+RUN chmod -R 755 /var/www/html/bootstrap/cache || echo ""
