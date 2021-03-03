@@ -29,7 +29,7 @@ definitions:
         name: Deploy to Staging
         deployment: Staging
         script:
-          - apt-get update && apt-get install -y git && git --version
+          - apt-get update && apt-get install -y git unzip jq && git --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
           - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
           - echo "Deploying to Staging Env"
