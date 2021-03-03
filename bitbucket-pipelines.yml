@@ -33,7 +33,7 @@ definitions:
           - git --version && bash --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
           - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
-          - echo "Deploying to Staging Env"
+          - echo "Deploying to Staging Environment"
           - ./appws_deploy.sh Staging Webservice
           
 pipelines:
