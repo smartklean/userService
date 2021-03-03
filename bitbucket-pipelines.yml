@@ -25,15 +25,13 @@ definitions:
         name: Check the Quality Gate on SonarCloud
         script:
           - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
-    - step: &checkout-deploy-kit
-        name: Check out Deploy-Kit repo
+    - step: &deploy-to-staging
+        name: Deploy to Staging
+        deployment: Staging
         script:
           - apt-get update && apt-get install -y git && git --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
           - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
-    - step: &deploy-to-staging
-        name: Deploy to Staging
-        script:
           - echo "Deploying to Staging Env"
           - ./appws_deploy.sh Staging Webservice
           
