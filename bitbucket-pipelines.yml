@@ -28,6 +28,9 @@ definitions:
           - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
     - step: &deploy-to-staging
         name: Deploy to Staging
+        caches:
+          - docker
+          - composer
         deployment: Staging
         script:
           - apt-get update && apt-get install -y bash git unzip jq
@@ -36,6 +39,8 @@ definitions:
           - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
           - echo "Deploying to Staging Environment"
           - ./appws_deploy.sh Staging Webservice
+        services:
+          - docker
           
 pipelines:
   default:
