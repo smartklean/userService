@@ -2,7 +2,7 @@
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
 #image: php:7.4.15
-image: cashenvoyng/deploykit-php-aws:v1.0
+image: cashenvoyng/deploykit-php-aws:v1.0.1
 clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
 
@@ -33,8 +33,6 @@ definitions:
           - composer
         deployment: Staging
         script:
-          - apt-get update && apt-get install -y bash git unzip jq
-          - git --version && bash --version
           - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
           - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
           - echo "Deploying To Staging Environment"
