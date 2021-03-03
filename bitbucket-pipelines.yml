@@ -45,7 +45,6 @@ pipelines:
     master:
       #- step: *build-test-sonarcloud
       #- step: *check-quality-gate-sonarcloud
-      - step: *checkout-deploy-kit
       - step: *deploy-to-staging
   pull-requests:
     '**':
