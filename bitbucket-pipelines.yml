@@ -41,17 +41,16 @@ definitions:
           - docker
           
 pipelines:
-  default:
-    - step:
-        script:
-          - echo "This script runs on all branches that do not have any specific pipeline assigned in 'branches'"
+  custom:
+    deploy-to-staging:
+     - step: *deploy-to-staging 
   
   branches:
     master:
-      #- step: *build-test-sonarcloud
-      #- step: *check-quality-gate-sonarcloud
-      - step: *deploy-to-staging
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate-sonarcloud
+
   pull-requests:
     '**':
-      #- step: *build-test-sonarcloud
-      #- step: *check-quality-gate-sonarcloud
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate-sonarcloud
