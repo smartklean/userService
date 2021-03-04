@@ -78,8 +78,11 @@ ADD resources/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # ------------- Add a startup script ----------------------------------------------------
 
+COPY run-supervisord.sh /usr/local/bin/run-supervisord.sh
 COPY docker-ssh-setup.sh /usr/local/bin/docker-ssh-setup.sh
 COPY migrate-db.sh /usr/local/bin/migrate-db.sh
+
+RUN chmod +x /usr/local/bin/run-supervisord.sh
 RUN chmod +x /usr/local/bin/docker-ssh-setup.sh
 RUN chmod +x /usr/local/bin/migrate-db.sh
 
@@ -89,7 +92,8 @@ RUN chmod +x /usr/local/bin/migrate-db.sh
 EXPOSE 22 80
 
 # Set supervisor to manage container processes
-ENTRYPOINT ["/usr/bin/supervisord"]
+
+ENTRYPOINT ["bash", "/usr/local/bin/run-supervisord.sh"]
 
 #------------- Container Config - Extras for non local environment -------------------------
 
