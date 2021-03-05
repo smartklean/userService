@@ -39,10 +39,22 @@ definitions:
           - ./appws_deploy.sh Staging Webservice
         services:
           - docker
+    - step: &deploy-to-production
+        name: Deploy to Production
+        caches:
+          - docker
+          - composer
+        deployment: Production
+        script:
+          - echo "Deploying To Production Environment - Coming Soon"
+        services:
+          - docker
           
 pipelines:
   custom:
     deploy-to-staging:
+     - step: *build-test-sonarcloud
+     - step: *check-quality-gate-sonarcloud
      - step: *deploy-to-staging 
   
   branches:
