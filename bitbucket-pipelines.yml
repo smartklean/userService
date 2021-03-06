@@ -1,8 +1,8 @@
 # Do not edit
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-#image: php:7.4.15
-image: cashenvoyng/deploykit-php-aws:v1.0.1
+
+image: cashenvoyng/deploykit-php-aws:latest
 clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
 
@@ -53,8 +53,6 @@ definitions:
 pipelines:
   custom:
     deploy-to-staging:
-     - step: *build-test-sonarcloud
-     - step: *check-quality-gate-sonarcloud
      - step: *deploy-to-staging 
   
   branches:
