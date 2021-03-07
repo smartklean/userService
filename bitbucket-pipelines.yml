@@ -7,6 +7,9 @@ clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
 
 definitions:
+  services:
+    docker:
+      memory: 2048 
   caches:
     sonar: ~/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
   steps:
