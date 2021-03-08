@@ -80,6 +80,7 @@ ADD resources/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY docker-ssh-setup.sh /usr/local/bin/docker-ssh-setup.sh
 COPY migrate-db.sh /usr/local/bin/migrate-db.sh
+
 RUN chmod +x /usr/local/bin/docker-ssh-setup.sh
 RUN chmod +x /usr/local/bin/migrate-db.sh
 

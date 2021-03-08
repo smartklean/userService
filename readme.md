@@ -6,7 +6,7 @@ This will create a dockerized stack for our service, made up of one container th
 
 In the `docker-compse.yml` file, the container name is set to ServiceScaffold. You should change this
 
-### **Directory Structure**
+### **Directory Structure** 
 ```
 +-- .git
 +-- resources

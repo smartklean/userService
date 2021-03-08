@@ -2,7 +2,7 @@
 
 env | grep -E -v "^(BASTION2_SSH_PUBLIC_KEY=|BASTION1_SSH_PUBLIC_KEY=|HOME=|USER=|MAIL=|LC_ALL=|LS_COLORS=|LANG=|HOSTNAME=|PWD=|TERM=|SHLVL=|LANGUAGE=|_=)" >> /etc/environment
 
-env | grep USERSWS_ >> /var/www/html/.env
+env | grep "$VARS_PREFIX" >> /var/www/html/.env
 chown www-data:www-data /var/www/html/.env
 
 if [ -z "$BASTION1_SSH_PUBLIC_KEY"  ] || [ -z "$BASTION2_SSH_PUBLIC_KEY"  ]; then
