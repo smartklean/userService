@@ -48,7 +48,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/lumen.log'),
+            'path' => storage_path('logs/'.strtolower(substr(env('VARS_PREFIX'),0,-1)).'/lumen.log'),
             'level' => 'debug',
             'days' => 14,
         ],
