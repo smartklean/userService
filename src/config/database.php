@@ -2,6 +2,17 @@
 
 use Illuminate\Support\Str;
 
+const DB_DRIVER = 'mysql';
+const UNIX_SOCKET = env('DB_SOCKET');
+const DB_CHARSET = env('DB_CHARSET', 'utf8');
+const DB_COLLATION = env('DB_COLLATION', 'utf8_general_ci');
+const DB_PREFIX = env('DB_PREFIX', '');
+const DB_STRICT_MODE = env('DB_STRICT_MODE', true);
+const DB_ENGINE = env('DB_ENGINE', 'InnoDB');
+const DB_TIMEZONE = env('DB_TIMEZONE', '+01:00');
+
+
+
 return [
 
     /*
@@ -42,35 +53,35 @@ return [
         ],
 
         'mysql' => [
-            'driver' => 'mysql',
-            'host' => env('USERSWS_DB_HOST', '127.0.0.1'),
-            'port' => env('USERSWS_DB_PORT', 3306),
-            'database' => env('USERSWS_DB_DATABASE', 'forge'),
-            'username' => env('USERSWS_DB_USERNAME', 'forge'),
-            'password' => env('USERSWS_DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'collation' => env('DB_COLLATION', 'utf8_general_ci'),
-            'prefix' => env('DB_PREFIX', ''),
-            'strict' => env('DB_STRICT_MODE', true),
-            'engine' => env('DB_ENGINE', 'InnoDB'),
-            'timezone' => env('DB_TIMEZONE', '+00:00'),
+            'driver' => DB_DRIVER,
+            'host' => env('USERSWS_DB_HOST'),
+            'port' => env('USERSWS_DB_PORT'),
+            'database' => env('USERSWS_DB_DATABASE'),
+            'username' => env('USERSWS_DB_USERNAME'),
+            'password' => env('USERSWS_DB_PASSWORD'),
+            'unix_socket' => UNIX_SOCKET,
+            'charset' => DB_CHARSET,
+            'collation' => DB_COLLATION,
+            'prefix' => DB_PREFIX,
+            'strict' => DB_STRICT_MODE,
+            'engine' => DB_ENGINE,
+            'timezone' => DB_TIMEZONE,
         ],
 
         'mysql_test' => [
-            'driver' => 'mysql',
-            'host' => env('USERSWS_TEST_DB_HOST', '127.0.0.1'),
-            'port' => env('USERSWS_TEST_DB_PORT', 3306),
-            'database' => env('USERSWS_TEST_DB_DATABASE', 'forge'),
-            'username' => env('USERSWS_TEST_DB_USERNAME', 'forge'),
-            'password' => env('USERSWS_TEST_DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'collation' => env('DB_COLLATION', 'utf8_general_ci'),
-            'prefix' => env('DB_PREFIX', ''),
-            'strict' => env('DB_STRICT_MODE', true),
-            'engine' => env('DB_ENGINE', 'InnoDB'),
-            'timezone' => env('DB_TIMEZONE', '+00:00'),
+            'driver' => DB_DRIVER,
+            'host' => env('USERSWS_TEST_DB_HOST'),
+            'port' => env('USERSWS_TEST_DB_PORT'),
+            'database' => env('USERSWS_TEST_DB_DATABASE'),
+            'username' => env('USERSWS_TEST_DB_USERNAME'),
+            'password' => env('USERSWS_TEST_DB_PASSWORD'),
+            'unix_socket' => UNIX_SOCKET,
+            'charset' => DB_CHARSET,
+            'collation' => DB_COLLATION,
+            'prefix' => DB_PREFIX,
+            'strict' => DB_STRICT_MODE,
+            'engine' => DB_ENGINE,
+            'timezone' => DB_TIMEZONE,
         ],
 
         'pgsql' => [
