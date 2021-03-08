@@ -84,7 +84,7 @@ class UsersController extends Controller
             ->additional([
               'status' => true,
               'message' => 'User added successfully'
-            ], 200);
+            ], 201);
     }
 
     public function authenticate(Request $request){
@@ -116,7 +116,7 @@ class UsersController extends Controller
         return response()->json([
           'status' => false,
           'message' => 'Unauthenticated.'
-        ], 200);
+        ], 401);
       }
 
       $tokenGen = $user->createToken('Personal Access Token');
@@ -146,10 +146,11 @@ class UsersController extends Controller
       }
 
       $rules = [
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
-        'phone_number' => 'required|string|max:255|unique:users,phone_number,'.$user->id,
+        'first_name' => 'nullable|string|max:255',
+        'last_name' => 'nullable|string|max:255',
+        'password' => 'nullable|string|max:255',
+        'email' => 'nullable|string|email|max:255|unique:users,email,'.$user->id,
+        'phone_number' => 'nullable|string|max:255|unique:users,phone_number,'.$user->id,
         'is_developer' => 'nullable|boolean',
       ];
 
@@ -169,6 +170,7 @@ class UsersController extends Controller
         'first_name' => $request->input('first_name'),
         'last_name' => $request->input('last_name'),
         'email' => $request->input('email'),
+        'password' => Hash::make($request->input('password')),
         'phone_number' => $request->input('phone_number'),
         'is_developer' => $request->input('is_developer') !== null ? true : false,
       ])->save();

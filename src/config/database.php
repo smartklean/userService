@@ -57,6 +57,22 @@ return [
             'timezone' => env('DB_TIMEZONE', '+00:00'),
         ],
 
+        'mysql_test' => [
+            'driver' => 'mysql',
+            'host' => env('USERSWS_TEST_DB_HOST', '127.0.0.1'),
+            'port' => env('USERSWS_TEST_DB_PORT', 3306),
+            'database' => env('USERSWS_TEST_DB_DATABASE', 'forge'),
+            'username' => env('USERSWS_TEST_DB_USERNAME', 'forge'),
+            'password' => env('USERSWS_TEST_DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'collation' => env('DB_COLLATION', 'utf8_general_ci'),
+            'prefix' => env('DB_PREFIX', ''),
+            'strict' => env('DB_STRICT_MODE', true),
+            'engine' => env('DB_ENGINE', 'InnoDB'),
+            'timezone' => env('DB_TIMEZONE', '+00:00'),
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),
