@@ -39,16 +39,50 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Render an exception into an HTTP response.
+     * Render an exception into an HTTP response or Json response.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
-    {
-        return parent::render($request, $exception);
-    }
+     public function render($request, Throwable $exception)
+     {
+         if (!empty($exception)) {
+             $response = [
+                 'error' => 'Internal Server Error.'
+             ];
+
+             if (config('app.debug')) {
+                 $response['exception'] = get_class($exception);
+                 $response['message'] = $exception->getMessage();
+                 $response['trace'] = $exception->getTrace();
+             }
+
+             $status = 400;
+
+             if($exception instanceof ValidationException){
+                 return $this->convertValidationExceptionToResponse($exception, $request);
+             }else if($exception instanceof AuthenticationException){
+                 $status = 401;
+
+                 $response['error'] = 'Unauthenticated!';
+             }else if($exception instanceof \PDOException){
+                 $status = 500;
+
+                 $response['error'] = 'Internal Server Error';
+             }else if($this->isHttpException($exception)){
+
+                 $status = $exception->getStatusCode();
+
+                 $response['error'] = 'Resource Not Found.';
+             }else{
+                 $status = method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 400;
+             }
+
+             return response()->json($response,$status);
+
+         }
+     }
 }

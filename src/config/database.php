@@ -2,17 +2,6 @@
 
 use Illuminate\Support\Str;
 
-const DB_DRIVER = 'mysql';
-const UNIX_SOCKET = env('DB_SOCKET');
-const DB_CHARSET = env('DB_CHARSET', 'utf8');
-const DB_COLLATION = env('DB_COLLATION', 'utf8_general_ci');
-const DB_PREFIX = env('DB_PREFIX', '');
-const DB_STRICT_MODE = env('DB_STRICT_MODE', true);
-const DB_ENGINE = env('DB_ENGINE', 'InnoDB');
-const DB_TIMEZONE = env('DB_TIMEZONE', '+01:00');
-
-
-
 return [
 
     /*
@@ -53,35 +42,35 @@ return [
         ],
 
         'mysql' => [
-            'driver' => DB_DRIVER,
-            'host' => env('USERSWS_DB_HOST'),
-            'port' => env('USERSWS_DB_PORT'),
-            'database' => env('USERSWS_DB_DATABASE'),
-            'username' => env('USERSWS_DB_USERNAME'),
-            'password' => env('USERSWS_DB_PASSWORD'),
-            'unix_socket' => UNIX_SOCKET,
-            'charset' => DB_CHARSET,
-            'collation' => DB_COLLATION,
-            'prefix' => DB_PREFIX,
-            'strict' => DB_STRICT_MODE,
-            'engine' => DB_ENGINE,
-            'timezone' => DB_TIMEZONE,
+            'driver' => 'mysql',
+            'host' => env('USERSWS_DB_HOST', config('constants.db.host')),
+            'port' => env('USERSWS_DB_PORT', config('contants.db.port')),
+            'database' => env('USERSWS_DB_DATABASE', config('contants.db.database')),
+            'username' => env('USERSWS_DB_USERNAME', config('constants.db.username')),
+            'password' => env('USERSWS_DB_PASSWORD', config('contants.db.password')),
+            'unix_socket' => env('USERSWS_DB_SOCKET', config('contants.db.socket')),
+            'charset' => env('USERSWS_DB_CHARSET', config('contants.db.charset')),
+            'collation' => env('USERSWS_DB_COLLATION', config('contants.db.collation')),
+            'prefix' => env('USERSWS_DB_PREFIX', config('contants.db.prefix')),
+            'strict' => env('USERSWS_STRICT_MODE', config('constants.db.strict')),
+            'engine' => env('USERSWS_DB_ENGINE', config('constants.db.engine')),
+            'timezone' => env('USERSWS_DB_TIMEZONE', config('constants.db.timezone')),
         ],
 
         'mysql_test' => [
-            'driver' => DB_DRIVER,
-            'host' => env('USERSWS_TEST_DB_HOST'),
-            'port' => env('USERSWS_TEST_DB_PORT'),
-            'database' => env('USERSWS_TEST_DB_DATABASE'),
-            'username' => env('USERSWS_TEST_DB_USERNAME'),
-            'password' => env('USERSWS_TEST_DB_PASSWORD'),
-            'unix_socket' => UNIX_SOCKET,
-            'charset' => DB_CHARSET,
-            'collation' => DB_COLLATION,
-            'prefix' => DB_PREFIX,
-            'strict' => DB_STRICT_MODE,
-            'engine' => DB_ENGINE,
-            'timezone' => DB_TIMEZONE,
+            'driver' => 'mysql',
+            'host' => env('USERSWS_TEST_DB_HOST', config('constants.db.host')),
+            'port' => env('USERSWS_TEST_DB_PORT', config('contants.db.port')),
+            'database' => env('USERSWS_TEST_DB_DATABASE', config('contants.db.database')),
+            'username' => env('USERSWS_TEST_DB_USERNAME', config('constants.db.username')),
+            'password' => env('USERSWS_TEST_DB_PASSWORD', config('contants.db.password')),
+            'unix_socket' => env('USERSWS_TEST_DB_SOCKET', config('contants.db.socket')),
+            'charset' => env('USERSWS_TEST_DB_CHARSET', config('contants.db.charset')),
+            'collation' => env('USERSWS_TEST_DB_COLLATION', config('contants.db.collation')),
+            'prefix' => env('USERSWS_TEST_DB_PREFIX', config('contants.db.prefix')),
+            'strict' => env('USERSWS_TEST_STRICT_MODE', config('constants.db.strict')),
+            'engine' => env('USERSWS_TEST_DB_ENGINE', config('constants.db.engine')),
+            'timezone' => env('USERSWS_TEST_DB_TIMEZONE', config('constants.db.timezone')),
         ],
 
         'pgsql' => [
