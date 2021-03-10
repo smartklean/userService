@@ -10,8 +10,9 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="CACHE_DRIVER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="USERSWS_APP_ENV" value="testing"/>
+        <env name="USERSWS_CACHE_DRIVER" value="array"/>
+        <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
+        <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
     </php>
 </phpunit>
