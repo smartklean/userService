@@ -20,7 +20,7 @@ return [
     'socket' => '',
     'charset' => 'utf8',
     'collation' => 'utf8_general_ci',
-    'prefix' => ''
+    'prefix' => '',
     'strict' => true,
     'engine' => 'InnoDB',
     'timezone' => '+01:00'
