@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         colors="true"
->
-    <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory suffix="Test.php">./tests</directory>
-        </testsuite>
-    </testsuites>
-    <php>
-        <env name="USERSWS_APP_ENV" value="testing"/>
-        <env name="USERSWS_CACHE_DRIVER" value="array"/>
-        <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
-        <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
-    </php>
-    <logging>
-        <log type="junit" target="test-reports/phpunit.junit.xml"/>
-        <log type="coverage-clover" target="test-reports/phpunit.coverage.xml"/>
-    </logging>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true">
+  <coverage>
+    <report>
+      <clover outputFile="test-reports/phpunit.coverage.xml"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="Application Test Suite">
+      <directory suffix="Test.php">./tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="USERSWS_APP_ENV" value="testing"/>
+    <env name="USERSWS_CACHE_DRIVER" value="array"/>
+    <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
+    <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
+  </php>
+  <logging>
+    <junit outputFile="test-reports/phpunit.junit.xml"/>
+  </logging>
 </phpunit>
