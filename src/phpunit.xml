@@ -25,9 +25,9 @@
         <exclude>
             <directory suffix=".php">./vendor</directory>
         </exclude>
-        <report>
+        <!-- <report>
             <clover outputFile="test-reports/phpunit.coverage.xml"/>
-        </report>
+        </report> -->
     </coverage>
 
 </phpunit>
