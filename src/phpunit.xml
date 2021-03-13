@@ -5,8 +5,6 @@
         <env name="USERSWS_CACHE_DRIVER" value="array"/>
         <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
         <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
-                <ini name="display_errors" value="On" />
-        <ini name="display_startup_errors" value="On" />
     </php>
     <logging>
         <junit outputFile="test-reports/phpunit.junit.xml"/>
