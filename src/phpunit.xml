@@ -15,4 +15,8 @@
         <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
         <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
     </php>
+    <logging>
+        <log type="junit" target="test-reports/phpunit.junit.xml"/>
+        <log type="coverage-clover" target="test-reports/phpunit.coverage.xml"/>
+    </logging>
 </phpunit>
