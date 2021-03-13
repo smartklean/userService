@@ -37,7 +37,7 @@ definitions:
           - sed -ir "s/^[#]*\s*${ENV_VAR_PREFIX}TEST_DB_HOST=.*/${ENV_VAR_PREFIX}TEST_DB_HOST=127.0.0.1/" .env
           - php artisan migrate --force --no-interaction -vvv && php artisan passport:install --force
           - export XDEBUG_MODE=coverage
-          - ./vendor/bin/phpunit --log-junit ./test-reports/junit.xml #--coverage-clover ./test-reports/phpunit.coverage.xml
+          - ./vendor/bin/phpunit #--log-junit ./test-reports/junit.xml --coverage-clover ./test-reports/phpunit.coverage.xml
           - pipe: sonarsource/sonarcloud-scan:1.2.0
           - rm -rf .env .envr && cd ..
         services:
