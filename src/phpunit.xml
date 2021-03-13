@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd" bootstrap="vendor/autoload.php" cacheResultFile=".phpunit.cache/test-results" executionOrder="depends,defects" forceCoversAnnotation="false" beStrictAboutCoversAnnotation="false" beStrictAboutOutputDuringTests="true" beStrictAboutTodoAnnotatedTests="true" failOnRisky="false" failOnWarning="false" verbose="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd" bootstrap="vendor/autoload.php" cacheResultFile=".phpunit.cache/test-results" executionOrder="depends,defects" forceCoversAnnotation="false" beStrictAboutCoversAnnotation="false" beStrictAboutOutputDuringTests="true" beStrictAboutTodoAnnotatedTests="true" failOnRisky="false" failOnWarning="false" verbose="true" colors="true">
     <php>
         <env name="USERSWS_APP_ENV" value="testing"/>
         <env name="USERSWS_CACHE_DRIVER" value="array"/>
         <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
         <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
+                <ini name="display_errors" value="On" />
+        <ini name="display_startup_errors" value="On" />
     </php>
     <logging>
         <junit outputFile="test-reports/phpunit.junit.xml"/>
@@ -23,9 +25,9 @@
         <exclude>
             <directory suffix=".php">./vendor</directory>
         </exclude>
-        <!-- <report>
+        <report>
             <clover outputFile="test-reports/phpunit.coverage.xml"/>
-        </report> -->
+        </report>
     </coverage>
 
 </phpunit>
