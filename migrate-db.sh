@@ -7,9 +7,8 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-cd storage || exit 1
-privkey=oauth-private.key
-pubkey=oauth-public.key
+privkey=./storage/oauth-private.key
+pubkey=./storage/oauth-public.key
 if [ -f "$privkey" ] && [ -f "$pubkey" ]; then
   echo "Passport key files already exist. No need to run php artisan passport:install."
   exit 0
