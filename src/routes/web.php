@@ -60,6 +60,7 @@ $router->group([
       $router->put('/{id}/update', 'Apis\v1\UsersController@update');
       $router->post('/create', 'Apis\v1\UsersController@store');
       $router->post('/authenticate', 'Apis\v1\UsersController@authenticate');
+      $router->get('/{id}/token/revoke', 'Apis\v1\UsersController@revokeToken');
       $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
     });
   });

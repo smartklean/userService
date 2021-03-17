@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Apis\v1;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Laravel\Passport\TokenRepository;
+use Laravel\Passport\RefreshTokenRepository;
 
 class UsersController extends Controller
 {
@@ -28,7 +32,7 @@ class UsersController extends Controller
       return UserResource::collection($users)
               ->additional([
                 'status' => true,
-                'message' => 'Success'
+                'message' => __('response.messages.users.found_multiple')
               ], 200);
     }
 
@@ -38,14 +42,15 @@ class UsersController extends Controller
       if(!$user){
         return response()->json([
           'status' => false,
-          'message' => 'User could not be found'
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.users.not_found')
         ], 400);
       }
 
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => 'User added successfully'
+              'message' => __('response.messages.users.found'),
             ], 200);
     }
 
@@ -64,7 +69,8 @@ class UsersController extends Controller
       if($validator->fails()){
         return response()->json([
           'status' => false,
-          'message' => 'Validation error occured.',
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.validation'),
           'data' => [
             'errors' => $validator->getMessageBag()->toArray()
           ]
@@ -83,7 +89,7 @@ class UsersController extends Controller
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => 'User added successfully'
+              'message' => __('response.messages.users.added')
             ], 201);
     }
 
@@ -98,7 +104,8 @@ class UsersController extends Controller
       if($validator->fails()){
         return response()->json([
           'status' => false,
-          'message' => 'Validation error occured.',
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.validation'),
           'data' => [
             'errors' => $validator->getMessageBag()->toArray()
           ]
@@ -115,24 +122,61 @@ class UsersController extends Controller
       if(!$user || !$passwordIsValid){
         return response()->json([
           'status' => false,
-          'message' => 'Unauthenticated.'
+          'error' => __('response.errors.unauthenticated'),
+          'messsage' => __('response.messages.users.unauthenticated'),
         ], 401);
       }
 
-      $tokenGen = $user->createToken('Personal Access Token');
+      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
+          'grant_type' => 'password',
+          'client_id' => $request->header('Client-Public'),
+          'client_secret' => $request->header('Client-Secret'),
+          'scope' => "",
+          'username' => $request->input('email'),
+          'password' => $request->input('password')
+      ]);
 
-      $token = $tokenGen->token;
+      $response = json_decode($res, true);
 
-      if($request->remember) $token->expires_at = Carbon::now()->addWeeks(1);
-
-      $token->save();
+      if($res->status() !== 200){
+        return response()->json([
+          'status' => false,
+          'error' => $response['error'],
+          'message' => $response['message']
+        ], 400);
+      }
 
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => 'Authenticated.',
-              'token' => $tokenGen->accessToken
+              'message' => __('response.messages.users.authenticated'),
+              'token' => $response
             ], 200);
+    }
+
+    public function revokeToken($id){
+      $user = User::find($id);
+
+      if(!$user){
+        return response()->json([
+          'status' => false,
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.users.not_found')
+        ], 400);
+      }
+
+      $tokenRepository = app(TokenRepository::class);
+      $refreshTokenRepository = app(RefreshTokenRepository::class);
+
+      foreach($user->tokens as $token){
+        $tokenRepository->revokeAccessToken($token->id);
+        $refreshTokenRepository->revokeRefreshTokensByAccessTokenId($token->id);
+      }
+
+      return response()->json([
+        'status' => true,
+        'message' => __('response.messages.users.token_revoked')
+      ], 200);
     }
 
     public function update(Request $request, $id){
@@ -141,7 +185,8 @@ class UsersController extends Controller
       if(!$user){
         return response()->json([
           'status' => false,
-          'message' => 'User could not be found'
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.users.not_found')
         ], 400);
       }
 
@@ -159,7 +204,8 @@ class UsersController extends Controller
       if($validator->fails()){
         return response()->json([
           'status' => false,
-          'message' => 'Validation error occured.',
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.validation'),
           'data' => [
             'errors' => $validator->getMessageBag()->toArray()
           ]
@@ -178,7 +224,7 @@ class UsersController extends Controller
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => 'User updated successfully'
+              'message' => __('response.messages.users.updated'),
             ], 200);
     }
 
@@ -190,7 +236,8 @@ class UsersController extends Controller
       if(!$user){
         return response()->json([
           'status' => false,
-          'message' => 'User could not be found'
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.users.not_found'),
         ], 400);
       }
 
@@ -199,7 +246,7 @@ class UsersController extends Controller
       return (new UserResource($old))
             ->additional([
               'status' => true,
-              'message' => 'User deleted successfully'
+              'message' => __('response.messages.users.deleted'),
             ], 200);
     }
 }
