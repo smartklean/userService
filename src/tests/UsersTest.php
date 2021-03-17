@@ -61,43 +61,6 @@ class UsersTest extends TestCase
         ]);
     }
 
-    public function testAuthenticateValidUser()
-    {
-        $user = User::factory()->raw();
-
-        $user = User::create($user);
-
-        $this->post('/api/v1/users/authenticate', [
-          'email' => $user->email,
-          'password' => 'password'
-        ]);
-
-        $this->seeStatusCode(200);
-        $this->seeJsonStructure([
-          'status',
-          'data',
-          'message'
-        ]);
-    }
-
-    public function testAuthenticateInvalidUser()
-    {
-        $user = User::factory()->raw();
-
-        $user = User::create($user);
-
-        $this->post('/api/v1/users/authenticate', [
-          'email' => $user->email,
-          'password' => 'incorrect_password'
-        ]);
-
-        $this->seeStatusCode(401);
-        $this->seeJsonStructure([
-          'status',
-          'message'
-        ]);
-    }
-
     public function testFetchSingleUser()
     {
         $user = User::factory()->raw();

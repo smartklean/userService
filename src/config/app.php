@@ -54,6 +54,8 @@ return [
 
     'url' => env('USERSWS_APP_URL', 'http://localhost'),
 
+    'docker_internal' => env('USERSWS_APP_DOCKER_INTERNAL'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

@@ -35,7 +35,5 @@ class AuthServiceProvider extends ServiceProvider
                 return User::where('api_token', $request->input('api_token'))->first();
             }
         });
-
-        \Dusterio\LumenPassport\LumenPassport::routes($this->app, ['prefix' => 'api/v1/oauth']);
     }
 }
