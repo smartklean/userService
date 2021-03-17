@@ -29,8 +29,6 @@ definitions:
           - composer
           - sonar
         script:
-          - apt-get update && apt-get install -y unzip
-          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
           - cd src && composer update && composer --version
           - echo "sonar.php.tests.reportPath=/opt/atlassian/pipelines/agent/build/src/test-reports/phpunit.junit.xml" > sonar-project.properties
           - echo "sonar.php.coverage.reportPaths=/opt/atlassian/pipelines/agent/build/src/test-reports/phpunit.coverage.xml" >> sonar-project.properties
@@ -38,7 +36,6 @@ definitions:
           - sed -ir "s/^[#]*\s*${ENV_VAR_PREFIX}DB_HOST=.*/${ENV_VAR_PREFIX}DB_HOST=127.0.0.1/" .env
           - sed -ir "s/^[#]*\s*${ENV_VAR_PREFIX}TEST_DB_HOST=.*/${ENV_VAR_PREFIX}TEST_DB_HOST=127.0.0.1/" .env
           - php artisan migrate --force --no-interaction -vvv && php artisan passport:install --force
-          - export XDEBUG_MODE=coverage
           - ./vendor/bin/phpunit --log-junit ./test-reports/phpunit.junit.xml #--coverage-clover ./test-reports/phpunit.coverage.xml
           - pipe: sonarsource/sonarcloud-scan:1.2.0
           - rm -rf .env .envr sonar-project.properties && cd ..
@@ -55,8 +52,7 @@ definitions:
           - composer
         deployment: Staging
         script:
-          - git clone git@bitbucket.org:cashenvoy-engineering/deploy-kit.git
-          - cd deploy-kit && cp -r * ../ && cd .. && ls -latr
+          - cp -r /usr/local/bin/deploykit/* ./ && ls -latr
           - echo "Deploying To Staging Environment"
           - ./appws_deploy.sh Staging Webservice
         services:
