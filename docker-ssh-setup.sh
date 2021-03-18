@@ -10,6 +10,15 @@ if [ -z "$BASTION1_SSH_PUBLIC_KEY"  ] || [ -z "$BASTION2_SSH_PUBLIC_KEY"  ]; the
   exit 1
 fi
 
+# Setup cron for refreshing AWS credentials
+cd /usr/local/bin || exit 1
+echo "SHELL=/bin/bash" > cronjobs.txt
+echo "MAILTO=ce-nextgen@cashenvoy.com" >> cronjobs.txt
+crontab -l | grep -v tokens:purge >> cronjobs.txt
+echo "0 * * * * . cd /var/www/html && /usr/bin/php7.4 artisan tokens:purge &> /var/www/html/token_purge.log " >> cronjobs.txt
+crontab cronjobs.txt
+service cron start
+
 # Create a folder to store user's SSH keys if it does not exist.
 USER_SSH_KEYS_FOLDER=~/.ssh
 [ ! -d "$USER_SSH_KEYS_FOLDER" ] && mkdir -p $USER_SSH_KEYS_FOLDER
