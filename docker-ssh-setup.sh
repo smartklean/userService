@@ -15,7 +15,7 @@ cd /usr/local/bin || exit 1
 echo "SHELL=/bin/bash" > cronjobs.txt
 echo "MAILTO=ce-nextgen@cashenvoy.com" >> cronjobs.txt
 crontab -l | grep -v tokens:purge >> cronjobs.txt
-echo "0 * * * * . cd /var/www/html && /usr/bin/php7.4 artisan tokens:purge &> /var/www/html/token_purge.log " >> cronjobs.txt
+echo "0 * * * * . cd /var/www/html && /usr/bin/php7.4 artisan tokens:purge &> /var/www/html/storage/logs/token_purge.log " >> cronjobs.txt
 crontab cronjobs.txt
 service cron start
 
