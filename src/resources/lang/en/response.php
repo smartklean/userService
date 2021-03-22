@@ -18,21 +18,19 @@ return [
   ],
 
   'messages' => [
-    'users' => [
-      'added' => 'The user was added successfully.',
-      'added_multiple' => 'The users were added successfully.',
-      'updated' => 'The user was updated successfully.',
-      'updated_multiple' => 'The users were updated successfully.',
-      'found' => 'The user was retrived successfully.',
-      'found_multiple' => 'The users were retrived successfully.',
-      'not_found' => 'The user could not be found.',
-      'deleted' => 'The user was deleted successfully.',
-      'deleted_multiple' => 'The users were deleted successfully.',
-      'authenticated' => 'These user was authenticated successfully.',
-      'unauthenticated' => 'These credentials do not match our records.',
-      'token_revoked' => 'The tokens for this user were revoked successfully.',
-    ],
-
+    'added' => 'The :attr was added successfully.',
+    'added_multiple' => 'The :attr were added successfully.',
+    'updated' => 'The :attr was updated successfully.',
+    'updated_multiple' => 'The :attr were updated successfully.',
+    'found' => 'The :attr was retrived successfully.',
+    'found_multiple' => 'The :attr were retrived successfully.',
+    'not_found' => 'The :attr could not be found.',
+    'deleted' => 'The :attr was deleted successfully.',
+    'deleted_multiple' => 'The :attr were deleted successfully.',
+    'authenticated' => 'These user was authenticated successfully.',
+    'unauthenticated' => 'These credentials do not match our records.',
+    'token_revoked' => 'The tokens for this user were revoked successfully.',
+    'token_mismatch' => 'The token provided does not belong to this user.',
     'validation' => 'One or more parameters did not pass the validation checks.',
   ]
 ];

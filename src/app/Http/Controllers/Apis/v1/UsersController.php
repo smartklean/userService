@@ -32,7 +32,7 @@ class UsersController extends Controller
       return UserResource::collection($users)
               ->additional([
                 'status' => true,
-                'message' => __('response.messages.users.found_multiple')
+                'message' => __('response.messages.found_multiple', ['attr' => 'users']),
               ], 200);
     }
 
@@ -43,14 +43,14 @@ class UsersController extends Controller
         return response()->json([
           'status' => false,
           'error' => __('response.errors.request'),
-          'message' => __('response.messages.users.not_found')
+          'message' => __('response.messages.not_found', ['attr' => 'user']),
         ], 400);
       }
 
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => __('response.messages.users.found'),
+              'message' => __('response.messages.found', ['attr' => 'user']),
             ], 200);
     }
 
@@ -83,13 +83,13 @@ class UsersController extends Controller
         'email' => $request->input('email'),
         'password' => Hash::make($request->input('password')),
         'phone_number' => $request->input('phone_number'),
-        'is_developer' => $request->input('is_developer') !== null ? true : false,
+        'is_developer' => $request->input('is_developer') !== null ? $request->input('is_developer') : false,
       ]);
 
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => __('response.messages.users.added')
+              'message' => __('response.messages.added', ['attr' => 'user']),
             ], 201);
     }
 
@@ -123,7 +123,7 @@ class UsersController extends Controller
         return response()->json([
           'status' => false,
           'error' => __('response.errors.unauthenticated'),
-          'messsage' => __('response.messages.users.unauthenticated'),
+          'messsage' => __('response.messages.unauthenticated'),
         ], 401);
       }
 
@@ -149,19 +149,21 @@ class UsersController extends Controller
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => __('response.messages.users.authenticated'),
+              'message' => __('response.messages.authenticated'),
               'token' => $response
             ], 200);
     }
 
-    public function revokeToken($id){
+    public function revokeToken(Request $request, $id){
+      return $request->user;
+
       $user = User::find($id);
 
       if(!$user){
         return response()->json([
           'status' => false,
           'error' => __('response.errors.request'),
-          'message' => __('response.messages.users.not_found')
+          'message' => __('response.messages.not_found', ['attr' => 'user'])
         ], 400);
       }
 
@@ -175,7 +177,7 @@ class UsersController extends Controller
 
       return response()->json([
         'status' => true,
-        'message' => __('response.messages.users.token_revoked')
+        'message' => __('response.messages.token_revoked')
       ], 200);
     }
 
@@ -186,14 +188,13 @@ class UsersController extends Controller
         return response()->json([
           'status' => false,
           'error' => __('response.errors.request'),
-          'message' => __('response.messages.users.not_found')
+          'message' => __('response.messages.not_found', ['attr' => 'user'])
         ], 400);
       }
 
       $rules = [
         'first_name' => 'nullable|string|max:255',
         'last_name' => 'nullable|string|max:255',
-        'password' => 'nullable|string|max:255',
         'email' => 'nullable|string|email|max:255|unique:users,email,'.$user->id,
         'phone_number' => 'nullable|string|max:255|unique:users,phone_number,'.$user->id,
         'is_developer' => 'nullable|boolean',
@@ -216,15 +217,14 @@ class UsersController extends Controller
         'first_name' => $request->input('first_name'),
         'last_name' => $request->input('last_name'),
         'email' => $request->input('email'),
-        'password' => Hash::make($request->input('password')),
         'phone_number' => $request->input('phone_number'),
-        'is_developer' => $request->input('is_developer') !== null ? true : false,
+        'is_developer' => $request->input('is_developer') !== null ? $request->input('is_developer') : false,
       ])->save();
 
       return (new UserResource($user))
             ->additional([
               'status' => true,
-              'message' => __('response.messages.users.updated'),
+              'message' => __('response.messages.updated', ['attr' => 'user']),
             ], 200);
     }
 
@@ -237,7 +237,7 @@ class UsersController extends Controller
         return response()->json([
           'status' => false,
           'error' => __('response.errors.request'),
-          'message' => __('response.messages.users.not_found'),
+          'message' => __('response.messages.not_found', ['attr' => 'user']),
         ], 400);
       }
 
@@ -246,7 +246,7 @@ class UsersController extends Controller
       return (new UserResource($old))
             ->additional([
               'status' => true,
-              'message' => __('response.messages.users.deleted'),
+              'message' => __('response.messages.deleted', ['attr' => 'user']),
             ], 200);
     }
 }
