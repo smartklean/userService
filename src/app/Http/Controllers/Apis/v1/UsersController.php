@@ -95,8 +95,8 @@ class UsersController extends Controller
 
     public function authenticate(Request $request){
       $rules = [
+        'email' => 'required|string|email|max:255',
         'password' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255'
       ];
 
       $validator =  Validator::make($request->all(), $rules);
@@ -155,9 +155,7 @@ class UsersController extends Controller
     }
 
     public function revokeToken(Request $request, $id){
-      return $request->user;
-
-      $user = User::find($id);
+      $user = $request->user;
 
       if(!$user){
         return response()->json([
