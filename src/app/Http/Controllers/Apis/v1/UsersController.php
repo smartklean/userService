@@ -154,8 +154,8 @@ class UsersController extends Controller
             ], 200);
     }
 
-    public function revokeToken(Request $request, $id){
-      $user = $request->user;
+    public function revokeToken(Request $request){
+      $user = $request->user();
 
       if(!$user){
         return response()->json([
@@ -177,6 +177,10 @@ class UsersController extends Controller
         'status' => true,
         'message' => __('response.messages.token_revoked')
       ], 200);
+    }
+
+    public function resetToken(Request $request){
+      //do something
     }
 
     public function update(Request $request, $id){
