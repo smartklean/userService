@@ -25,4 +25,8 @@ return [
     'engine' => 'InnoDB',
     'timezone' => '+01:00'
   ],
+
+  'rules' => [
+    'email' => 'required|string|email|max:255'
+  ]
 ];

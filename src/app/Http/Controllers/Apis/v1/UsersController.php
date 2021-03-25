@@ -100,7 +100,7 @@ class UsersController extends Controller
 
     public function authenticate(Request $request){
       $rules = [
-        'email' => 'required|string|email|max:255',
+        'email' => config('constants.rules.email'),
         'password' => 'required|string|max:255',
       ];
 
@@ -282,7 +282,7 @@ class UsersController extends Controller
 
     public function sendPasswordResetEmail(Request $request){
       $rules = [
-          'email' => 'required|string|email|max:255'
+          'email' => config('constants.rules.email')
       ];
 
       $validator = Validator::make($request->all(), $rules);
@@ -339,7 +339,7 @@ class UsersController extends Controller
 
     public function resetPassword(Request $request){
         $rules = [
-            'email' => 'required|string|email|max:255',
+            'email' => config('constants.rules.email'),
             'password' => 'required|string|max:255|confirmed',
         ];
 
