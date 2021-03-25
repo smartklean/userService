@@ -62,6 +62,8 @@ $router->group([
       $router->post('/authenticate', 'Apis\v1\UsersController@authenticate');
       $router->post('/token/revoke', 'Apis\v1\UsersController@revokeToken');
       $router->post('/token/reset', 'Apis\v1\UsersController@resetToken');
+      $router->post('/password/email', 'Apis\v1\UsersController@sendPasswordResetEmail');
+      $router->post('/password/reset', 'Apis\v1\UsersController@resetPassword');
       $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
     });
   });
