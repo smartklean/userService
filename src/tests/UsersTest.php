@@ -17,6 +17,8 @@ class UsersTest extends TestCase
     {
         $user = User::factory()->raw();
 
+        $user['password_confirmation'] = $user['password'];
+
         $this->post('/api/v1/users/create', $user);
 
         $this->seeStatusCode(201);
