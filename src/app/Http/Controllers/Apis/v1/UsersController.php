@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers\Apis\v1;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Laravel\Passport\TokenRepository;
-use Laravel\Passport\RefreshTokenRepository;
 
 class UsersController extends Controller
 {
@@ -98,119 +93,6 @@ class UsersController extends Controller
             ], 201);
     }
 
-    public function authenticate(Request $request){
-      $rules = [
-        'email' => config('constants.rules.email'),
-        'password' => 'required|string|max:255',
-      ];
-
-      $validator =  Validator::make($request->all(), $rules);
-
-      if($validator->fails()){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.validation'),
-          'data' => [
-            'errors' => $validator->getMessageBag()->toArray()
-          ]
-        ], 400);
-      }
-
-      $user = User::where('email', $request->input('email'))->first();
-
-      if($user)
-        $passwordIsValid = Hash::check($request->input('password'), $user->password);
-      else
-        $passwordIsValid = false;
-
-      if(!$user || !$passwordIsValid){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.unauthenticated'),
-          'messsage' => __('response.messages.unauthenticated'),
-        ], 401);
-      }
-
-      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
-          'grant_type' => 'password',
-          'client_id' => $request->header('Client-Public'),
-          'client_secret' => $request->header('Client-Secret'),
-          'scope' => '',
-          'username' => $request->input('email'),
-          'password' => $request->input('password')
-      ]);
-
-      $response = json_decode($res, true);
-
-      if($res->status() !== 200){
-        return response()->json([
-          'status' => false,
-          'error' => $response['error'],
-          'message' => $response['message']
-        ], 400);
-      }
-
-      return (new UserResource($user))
-            ->additional([
-              'status' => true,
-              'message' => __('response.messages.authenticated'),
-              'token' => $response
-            ], 200);
-    }
-
-    public function revokeToken(Request $request){
-      $user = $request->user();
-
-      if(!$user){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.not_found', ['attr' => 'user'])
-        ], 400);
-      }
-
-      $tokenRepository = app(TokenRepository::class);
-      $refreshTokenRepository = app(RefreshTokenRepository::class);
-
-      foreach($user->tokens as $token){
-        $tokenRepository->revokeAccessToken($token->id);
-        $refreshTokenRepository->revokeRefreshTokensByAccessTokenId($token->id);
-      }
-
-      return response()->json([
-        'status' => true,
-        'message' => __('response.messages.token_revoked')
-      ], 200);
-    }
-
-    public function resetToken(Request $request){
-      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
-          'grant_type' => 'refresh_token',
-          'refresh_token' => $request->header('Refresh-Token'),
-          'client_id' => $request->header('Client-Public'),
-          'client_secret' => $request->header('Client-Secret'),
-          'scope' => '',
-          'expires_at' => 900
-      ]);
-
-      $response = json_decode($res, true);
-
-      if($res->status() !== 200){
-        return response()->json([
-          'status' => false,
-          'error' => $response['error'],
-          'message' => $response['message']
-        ], 400);
-      }
-
-      return response()->json([
-        'status' => true,
-        'message' => __('response.messages.token_reset'),
-        'token' => $response
-      ], 200);
-    }
-
     public function update(Request $request, $id){
       $user = User::find($id);
 
@@ -278,137 +160,5 @@ class UsersController extends Controller
               'status' => true,
               'message' => __('response.messages.deleted', ['attr' => 'user']),
             ], 200);
-    }
-
-    public function sendPasswordResetEmail(Request $request){
-      $rules = [
-          'email' => config('constants.rules.email')
-      ];
-
-      $validator = Validator::make($request->all(), $rules);
-
-      if ($validator->fails())
-      {
-          return response()->json([
-              'status' => false,
-              'error' => __('response.errors.request'),
-              'message' => __('response.messages.validation'),
-              'data' => [
-                'errors' => $validator->getMessageBag()->toArray()
-              ]
-          ], 400);
-      }
-
-      $email = $request->input('email');
-
-      $user = User::where('email', $email)->first();
-
-      if(!$user){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.not_found', ['attr' => 'user'])
-        ], 400);
-      }
-
-      $token = str_shuffle(uniqid().uniqid());
-
-      $unhashedToken = $token;
-
-      $token = Hash::make($token);
-
-      $exists = DB::table('password_resets')->where([
-          'email' => $email
-      ])->first();
-
-      if($exists){
-        DB::delete('delete from password_resets where email = ?', [$email]);
-      }
-
-      DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?)', [$email, $token, Carbon::now()]);
-
-      //trigger email notification service
-
-      return (new UserResource($user))
-            ->additional([
-              'status' => true,
-              'message' => __('response.messages.password_email'),
-              'token' => $unhashedToken
-            ], 200);
-    }
-
-    public function resetPassword(Request $request){
-        $rules = [
-            'email' => config('constants.rules.email'),
-            'password' => 'required|string|max:255|confirmed',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails())
-        {
-          return response()->json([
-              'status' => false,
-              'error' => __('response.errors.request'),
-              'message' => __('response.messages.validation'),
-              'data' => [
-                'errors' => $validator->getMessageBag()->toArray()
-              ]
-          ], 400);
-        }
-
-        $email = $request->input('email');
-
-        $user = User::where('email', $email)->first();
-
-        if(!$user){
-          return response()->json([
-            'status' => false,
-            'error' => __('response.errors.request'),
-            'message' => __('response.messages.not_found', ['attr' => 'user'])
-          ], 400);
-        }
-
-        $token = DB::table('password_resets')->where(['email' => $user->email])->first();
-
-        if(isset($token)){
-            if(strtotime('-15 minutes') - strtotime(DB::table('password_resets')->where(['email' => $user->email])->first()->created_at) > 0){
-                return response()->json([
-                  'status' => false,
-                  'error' => __('response.errors.request'),
-                  'message' => __('response.messages.token_expired')
-                ], 400);
-            }
-        }else{
-            return response()->json([
-              'status' => false,
-              'error' => __('response.errors.request'),
-              'message' => __('response.messages.token_invalid')
-            ], 400);
-        }
-
-        if(Hash::check($request->header('Reset-Token'), $token->token)){
-            $user->password = Hash::make($request->input('password'));
-            $user->save();
-
-            $token = DB::table('password_resets')->where(['email' => $user->email]);
-
-            if($token->first() !== null)
-                $token->delete();
-
-            $credentials = ['email' => $request->input('email'), 'password' => $request->input('password')];
-
-            return (new UserResource($user))
-                  ->additional([
-                    'status' => true,
-                    'message' => __('response.messages.password_reset')
-                  ], 200);
-        }
-
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.token_mismatch')
-        ], 400);
     }
 }
