@@ -132,7 +132,7 @@ $app->router->group([
 });
 
 \Dusterio\LumenPassport\LumenPassport::routes($app);
-\Dusterio\LumenPassport\LumenPassport::tokensExpireIn(\Carbon\Carbon::now()->addMinutes(15), 2);
+\Laravel\Passport\Passport::tokensExpireIn(\Carbon\Carbon::now()->addMinutes(15), 2);
 \Laravel\Passport\Passport::refreshTokensExpireIn(\Carbon\Carbon::now()->addMinutes(60), 2);
 
 return $app;

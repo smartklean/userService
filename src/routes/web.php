@@ -54,7 +54,6 @@ $router->group([
 
     $router->group([
       'prefix' => 'users',
-      'middleware' => 'auth:api'
     ], function() use ($router) {
       $router->get('/get[/{limit}]', 'Apis\v1\UsersController@fetch');
       $router->get('/{id}/get', 'Apis\v1\UsersController@fetchSingle');

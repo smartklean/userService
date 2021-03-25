@@ -29,6 +29,7 @@ return [
     'deleted_multiple' => 'The :attr were deleted successfully.',
     'authenticated' => 'These user was authenticated successfully.',
     'unauthenticated' => 'These credentials do not match our records.',
+    'token_reset' => 'The token was reset successfully.',
     'token_revoked' => 'The tokens for this user were revoked successfully.',
     'token_mismatch' => 'The token provided does not belong to this user.',
     'validation' => 'One or more parameters did not pass the validation checks.',

@@ -131,7 +131,7 @@ class UsersController extends Controller
           'grant_type' => 'password',
           'client_id' => $request->header('Client-Public'),
           'client_secret' => $request->header('Client-Secret'),
-          'scope' => "",
+          'scope' => '',
           'username' => $request->input('email'),
           'password' => $request->input('password')
       ]);
@@ -180,7 +180,30 @@ class UsersController extends Controller
     }
 
     public function resetToken(Request $request){
-      //do something
+      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
+          'grant_type' => 'refresh_token',
+          'refresh_token' => $request->header('Refresh-Token'),
+          'client_id' => $request->header('Client-Public'),
+          'client_secret' => $request->header('Client-Secret'),
+          'scope' => '',
+          'expires_at' => 900
+      ]);
+
+      $response = json_decode($res, true);
+
+      if($res->status() !== 200){
+        return response()->json([
+          'status' => false,
+          'error' => $response['error'],
+          'message' => $response['message']
+        ], 400);
+      }
+
+      return response()->json([
+        'status' => true,
+        'message' => __('response.messages.token_reset'),
+        'token' => $response
+      ], 200);
     }
 
     public function update(Request $request, $id){
