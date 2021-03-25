@@ -131,7 +131,7 @@ class UsersController extends Controller
           'grant_type' => 'password',
           'client_id' => $request->header('Client-Public'),
           'client_secret' => $request->header('Client-Secret'),
-          'scope' => "",
+          'scope' => '',
           'username' => $request->input('email'),
           'password' => $request->input('password')
       ]);
@@ -154,8 +154,8 @@ class UsersController extends Controller
             ], 200);
     }
 
-    public function revokeToken(Request $request, $id){
-      $user = $request->user;
+    public function revokeToken(Request $request){
+      $user = $request->user();
 
       if(!$user){
         return response()->json([
@@ -176,6 +176,33 @@ class UsersController extends Controller
       return response()->json([
         'status' => true,
         'message' => __('response.messages.token_revoked')
+      ], 200);
+    }
+
+    public function resetToken(Request $request){
+      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
+          'grant_type' => 'refresh_token',
+          'refresh_token' => $request->header('Refresh-Token'),
+          'client_id' => $request->header('Client-Public'),
+          'client_secret' => $request->header('Client-Secret'),
+          'scope' => '',
+          'expires_at' => 900
+      ]);
+
+      $response = json_decode($res, true);
+
+      if($res->status() !== 200){
+        return response()->json([
+          'status' => false,
+          'error' => $response['error'],
+          'message' => $response['message']
+        ], 400);
+      }
+
+      return response()->json([
+        'status' => true,
+        'message' => __('response.messages.token_reset'),
+        'token' => $response
       ], 200);
     }
 

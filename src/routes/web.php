@@ -53,14 +53,15 @@ $router->group([
     }]);
 
     $router->group([
-      'prefix' => 'users'
+      'prefix' => 'users',
     ], function() use ($router) {
       $router->get('/get[/{limit}]', 'Apis\v1\UsersController@fetch');
       $router->get('/{id}/get', 'Apis\v1\UsersController@fetchSingle');
       $router->put('/{id}/update', 'Apis\v1\UsersController@update');
       $router->post('/create', 'Apis\v1\UsersController@store');
       $router->post('/authenticate', 'Apis\v1\UsersController@authenticate');
-      $router->get('/{id}/token/revoke', 'Apis\v1\UsersController@revokeToken');
+      $router->post('/token/revoke', 'Apis\v1\UsersController@revokeToken');
+      $router->post('/token/reset', 'Apis\v1\UsersController@resetToken');
       $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
     });
   });
