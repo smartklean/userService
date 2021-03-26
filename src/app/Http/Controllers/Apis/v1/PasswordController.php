@@ -20,6 +20,12 @@ class PasswordController extends Controller
      * @return void
      */
 
+    public function __construct(){
+      define('ERR', 'response.errors.request');
+      define('ERR_NOT_FOUND', 'response.messages.not_found');
+      define('VALIDATION_ERR_MSG', 'response.messages.validation');
+    }
+
     public function sendPasswordResetEmail(Request $request){
       $rules = [
           'email' => 'required|string|email|max:255'
@@ -31,8 +37,8 @@ class PasswordController extends Controller
       {
           return response()->json([
               'status' => false,
-              'error' => __('response.errors.request'),
-              'message' => __('response.messages.validation'),
+              'error' => __(ERR),
+              'message' => __(VALIDATION_ERR_MSG),
               'data' => [
                 'errors' => $validator->getMessageBag()->toArray()
               ]
@@ -46,8 +52,8 @@ class PasswordController extends Controller
       if(!$user){
         return response()->json([
           'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.not_found', ['attr' => 'user'])
+          'error' => __(ERR),
+          'message' => __(ERR_NOT_FOUND, ['attr' => 'user'])
         ], 400);
       }
 
@@ -89,8 +95,8 @@ class PasswordController extends Controller
         {
           return response()->json([
               'status' => false,
-              'error' => __('response.errors.request'),
-              'message' => __('response.messages.validation'),
+              'error' => __(ERR),
+              'message' => __(VALIDATION_ERR_MSG),
               'data' => [
                 'errors' => $validator->getMessageBag()->toArray()
               ]
@@ -104,8 +110,8 @@ class PasswordController extends Controller
         if(!$user){
           return response()->json([
             'status' => false,
-            'error' => __('response.errors.request'),
-            'message' => __('response.messages.not_found', ['attr' => 'user'])
+            'error' => __(ERR),
+            'message' => __(ERR_NOT_FOUND, ['attr' => 'user'])
           ], 400);
         }
 
@@ -115,14 +121,14 @@ class PasswordController extends Controller
             if(strtotime('-15 minutes') - strtotime(DB::table('password_resets')->where(['email' => $user->email])->first()->created_at) > 0){
                 return response()->json([
                   'status' => false,
-                  'error' => __('response.errors.request'),
+                  'error' => __(ERR),
                   'message' => __('response.messages.token_expired')
                 ], 400);
             }
         }else{
             return response()->json([
               'status' => false,
-              'error' => __('response.errors.request'),
+              'error' => __(ERR),
               'message' => __('response.messages.token_invalid')
             ], 400);
         }
@@ -133,10 +139,9 @@ class PasswordController extends Controller
 
             $token = DB::table('password_resets')->where(['email' => $user->email]);
 
-            if($token->first() !== null)
-                $token->delete();
-
-            $credentials = ['email' => $request->input('email'), 'password' => $request->input('password')];
+            if($token->first() !== null){
+              $token->delete();
+            }
 
             return (new UserResource($user))
                   ->additional([
@@ -147,7 +152,7 @@ class PasswordController extends Controller
 
         return response()->json([
           'status' => false,
-          'error' => __('response.errors.request'),
+          'error' => __(ERR),
           'message' => __('response.messages.token_mismatch')
         ], 400);
     }
