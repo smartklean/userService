@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Apis\v1;
 
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
@@ -12,7 +11,7 @@ use App\Http\Controllers\Controller;
 use Laravel\Passport\TokenRepository;
 use Laravel\Passport\RefreshTokenRepository;
 
-class AccessTokenController extends Controller
+class AccessTokensController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -20,24 +19,6 @@ class AccessTokenController extends Controller
      * @return void
      */
     public function authenticate(Request $request){
-      $rules = [
-        'email' => 'required|string|email|max:255',
-        'password' => 'required|string|max:255',
-      ];
-
-      $validator =  Validator::make($request->all(), $rules);
-
-      if($validator->fails()){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.validation'),
-          'data' => [
-            'errors' => $validator->getMessageBag()->toArray()
-          ]
-        ], 400);
-      }
-
       $user = User::where('email', $request->input('email'))->first();
 
       if($user)
@@ -105,7 +86,7 @@ class AccessTokenController extends Controller
       ], 200);
     }
 
-    public function resetToken(Request $request){
+    public function refreshToken(Request $request){
       $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
           'grant_type' => 'refresh_token',
           'refresh_token' => $request->header('Refresh-Token'),

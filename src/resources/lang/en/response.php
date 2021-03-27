@@ -27,15 +27,16 @@ return [
     'not_found' => 'The :attr could not be found.',
     'deleted' => 'The :attr was deleted successfully.',
     'deleted_multiple' => 'The :attr were deleted successfully.',
+    'verified' => 'The :attr was verified successfully.',
+    'not_verified' => 'The :attr could not be verified.',
     'authenticated' => 'These user was authenticated successfully.',
     'unauthenticated' => 'These credentials do not match our records.',
+    'verification_code_sent' => 'The verification code was sent successfully',
     'password_email' => 'We\'ve emailed you your password reset token.',
     'password_reset' => 'Your password was reset successfully.',
     'token_reset' => 'The token was reset successfully.',
     'token_invalid' => 'The token provided is invalid.',
-    'token_expired' => 'The token provided has expired.',
     'token_revoked' => 'The tokens for this user were revoked successfully.',
-    'token_mismatch' => 'The token provided does not belong to this user.',
     'validation' => 'One or more parameters did not pass the validation checks.',
   ]
 ];
