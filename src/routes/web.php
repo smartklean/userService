@@ -45,12 +45,11 @@ $router->group([
   $router->group([
     'prefix' => 'v1'
   ], function() use ($router) {
-    $router->get('/token/validate', ['middleware' => 'auth:api', function(){
-      return response()->json([
-        'status' => true,
-        'message' => 'Token authenticated.'
-      ], 200);
-    }]);
+    $router->group([
+      'middleware' => 'auth:api'
+    ], function() use ($router) {
+      $router->get('/token/validate', 'Apis\v1\UsersController@fetchUserInstance');
+    });
 
     $router->group([
       'prefix' => 'users',
@@ -60,11 +59,28 @@ $router->group([
       $router->put('/{id}/update', 'Apis\v1\UsersController@update');
       $router->post('/create', 'Apis\v1\UsersController@store');
       $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
-      $router->post('/authenticate', 'Apis\v1\AccessTokenController@authenticate');
-      $router->post('/token/revoke', 'Apis\v1\AccessTokenController@revokeToken');
-      $router->post('/token/reset', 'Apis\v1\AccessTokenController@resetToken');
-      $router->post('/password/email', 'Apis\v1\PasswordController@sendPasswordResetEmail');
-      $router->post('/password/reset', 'Apis\v1\PasswordController@resetPassword');
+      $router->post('/authenticate', 'Apis\v1\AccessTokensController@authenticate');
+
+      $router->group([
+        'prefix' => 'token'
+      ], function() use ($router) {
+        $router->post('/revoke', 'Apis\v1\AccessTokensController@revokeToken');
+        $router->post('/refresh', 'Apis\v1\AccessTokensController@refreshToken');
+      });
+
+      $router->group([
+        'prefix' => 'password'
+      ], function() use ($router) {
+        $router->post('/email', 'Apis\v1\PasswordController@sendPasswordResetEmail');
+        $router->post('/reset', 'Apis\v1\PasswordController@resetPassword');
+      });
+
+      $router->group([
+        'prefix' => 'email'
+      ], function() use ($router) {
+        $router->post('/resend', 'Apis\v1\VerifyEmailController@resendVerificationCode');
+        $router->post('/verify', 'Apis\v1\VerifyEmailController@verifyEmail');
+      });
     });
   });
   /* Version 1 */

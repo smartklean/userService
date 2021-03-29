@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Apis\v1;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
@@ -23,28 +22,9 @@ class PasswordController extends Controller
     public function __construct(){
       define('ERR', 'response.errors.request');
       define('ERR_NOT_FOUND', 'response.messages.not_found');
-      define('VALIDATION_ERR_MSG', 'response.messages.validation');
     }
 
     public function sendPasswordResetEmail(Request $request){
-      $rules = [
-          'email' => 'required|string|email|max:255'
-      ];
-
-      $validator = Validator::make($request->all(), $rules);
-
-      if ($validator->fails())
-      {
-          return response()->json([
-              'status' => false,
-              'error' => __(ERR),
-              'message' => __(VALIDATION_ERR_MSG),
-              'data' => [
-                'errors' => $validator->getMessageBag()->toArray()
-              ]
-          ], 400);
-      }
-
       $email = $request->input('email');
 
       $user = User::where('email', $email)->first();
@@ -84,25 +64,6 @@ class PasswordController extends Controller
     }
 
     public function resetPassword(Request $request){
-        $rules = [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|max:255|confirmed',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails())
-        {
-          return response()->json([
-              'status' => false,
-              'error' => __(ERR),
-              'message' => __(VALIDATION_ERR_MSG),
-              'data' => [
-                'errors' => $validator->getMessageBag()->toArray()
-              ]
-          ], 400);
-        }
-
         $email = $request->input('email');
 
         $user = User::where('email', $email)->first();
@@ -117,43 +78,29 @@ class PasswordController extends Controller
 
         $token = DB::table('password_resets')->where(['email' => $user->email])->first();
 
-        if(isset($token)){
-            if(strtotime('-15 minutes') - strtotime(DB::table('password_resets')->where(['email' => $user->email])->first()->created_at) > 0){
-                return response()->json([
-                  'status' => false,
-                  'error' => __(ERR),
-                  'message' => __('response.messages.token_expired')
-                ], 400);
+        if(isset($token) && Hash::check($request->input('token'), $token->token)){
+            if(strtotime('-15 minutes') - strtotime(DB::table('password_resets')->where(['email' => $user->email])->first()->created_at) < 0){
+              $user->password = Hash::make($request->input('password'));
+              $user->save();
+
+              $token = DB::table('password_resets')->where(['email' => $user->email]);
+
+              if($token->first() !== null){
+                $token->delete();
+              }
+
+              return (new UserResource($user))
+                    ->additional([
+                      'status' => true,
+                      'message' => __('response.messages.password_reset')
+                    ], 200);
             }
-        }else{
-            return response()->json([
-              'status' => false,
-              'error' => __(ERR),
-              'message' => __('response.messages.token_invalid')
-            ], 400);
-        }
-
-        if(Hash::check($request->header('Reset-Token'), $token->token)){
-            $user->password = Hash::make($request->input('password'));
-            $user->save();
-
-            $token = DB::table('password_resets')->where(['email' => $user->email]);
-
-            if($token->first() !== null){
-              $token->delete();
-            }
-
-            return (new UserResource($user))
-                  ->additional([
-                    'status' => true,
-                    'message' => __('response.messages.password_reset')
-                  ], 200);
         }
 
         return response()->json([
           'status' => false,
           'error' => __(ERR),
-          'message' => __('response.messages.token_mismatch')
+          'message' => __('response.messages.token_invalid')
         ], 400);
     }
 }
