@@ -19,7 +19,7 @@ class UsersTest extends TestCase
 
         $user['password_confirmation'] = $user['password'];
 
-        $this->post('/api/v1/users/create', $user);
+        $this->post('/api/v1/user/create', $user);
 
         $this->seeStatusCode(201);
         $this->seeJsonStructure([
@@ -37,7 +37,7 @@ class UsersTest extends TestCase
 
         $newData = User::factory()->raw();
 
-        $this->put('/api/v1/users/'.$user->id.'/update', $newData);
+        $this->put('/api/v1/user/'.$user->id.'/update', $newData);
 
         $this->seeStatusCode(200);
         $this->seeJsonStructure([
@@ -53,7 +53,7 @@ class UsersTest extends TestCase
 
         $user = User::create($user);
 
-        $this->delete('/api/v1/users/'.$user->id.'/delete');
+        $this->delete('/api/v1/user/'.$user->id.'/delete');
 
         $this->seeStatusCode(200);
         $this->seeJsonStructure([
@@ -69,7 +69,7 @@ class UsersTest extends TestCase
 
         $user = User::create($user);
 
-        $this->get('/api/v1/users/'.$user->id.'/get');
+        $this->get('/api/v1/user/'.$user->id.'/get');
 
         $this->seeStatusCode(200);
         $this->seeJsonStructure([
@@ -81,7 +81,7 @@ class UsersTest extends TestCase
 
     public function testFetchAllUsers()
     {
-        $this->get('/api/v1/users/get');
+        $this->get('/api/v1/user/get');
 
         $this->seeStatusCode(200);
         $this->seeJsonStructure([
@@ -93,7 +93,7 @@ class UsersTest extends TestCase
 
     public function testFetchAllUsersWithPagination()
     {
-        $this->get('/api/v1/users/get?limit=3');
+        $this->get('/api/v1/user/get?limit=3');
 
         $this->seeStatusCode(200);
         $this->seeJsonStructure([

@@ -18,6 +18,10 @@ class AccessTokensController extends Controller
      *
      * @return void
      */
+    public function __construct(){
+      define('TOKEN_ENDPOINT', config('app.docker_internal').'/api/v1/user/oauth/token');
+    }
+
     public function authenticate(Request $request){
       $user = User::where('email', $request->input('email'))->first();
 
@@ -34,7 +38,7 @@ class AccessTokensController extends Controller
         ], 401);
       }
 
-      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
+      $res = Http::asForm()->post(TOKEN_ENDPOINT, [
           'grant_type' => 'password',
           'client_id' => $request->header('Client-Public'),
           'client_secret' => $request->header('Client-Secret'),
@@ -87,7 +91,7 @@ class AccessTokensController extends Controller
     }
 
     public function refreshToken(Request $request){
-      $res = Http::asForm()->post(config('app.docker_internal').'/oauth/token', [
+      $res = Http::asForm()->post(TOKEN_ENDPOINT, [
           'grant_type' => 'refresh_token',
           'refresh_token' => $request->header('Refresh-Token'),
           'client_id' => $request->header('Client-Public'),

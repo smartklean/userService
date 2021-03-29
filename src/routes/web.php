@@ -46,13 +46,7 @@ $router->group([
     'prefix' => 'v1'
   ], function() use ($router) {
     $router->group([
-      'middleware' => 'auth:api'
-    ], function() use ($router) {
-      $router->get('/token/validate', 'Apis\v1\UsersController@fetchUserInstance');
-    });
-
-    $router->group([
-      'prefix' => 'users',
+      'prefix' => 'user',
     ], function() use ($router) {
       $router->get('/get[/{limit}]', 'Apis\v1\UsersController@fetch');
       $router->get('/{id}/get', 'Apis\v1\UsersController@fetchSingle');
@@ -64,6 +58,11 @@ $router->group([
       $router->group([
         'prefix' => 'token'
       ], function() use ($router) {
+        $router->group([
+          'middleware' => 'auth:api'
+        ], function() use ($router) {
+          $router->get('/validate', 'Apis\v1\UsersController@fetchUserInstance');
+        });
         $router->post('/revoke', 'Apis\v1\AccessTokensController@revokeToken');
         $router->post('/refresh', 'Apis\v1\AccessTokensController@refreshToken');
       });
