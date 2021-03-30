@@ -14,7 +14,7 @@ class TokenValidationTest extends TestCase
      */
     public function testTokenValidation()
     {
-        $this->get('/api/v1/token/validate');
+        $this->get('/api/v1/user/token/validate');
 
         $this->seeStatusCode(200);
         $this->seeJsonStructure([

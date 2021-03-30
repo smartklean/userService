@@ -98,7 +98,6 @@ $app->routeMiddleware([
 $app->register(Laravel\Passport\PassportServiceProvider::class);
 $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
-
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -131,8 +130,9 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
-\Dusterio\LumenPassport\LumenPassport::routes($app);
+\Dusterio\LumenPassport\LumenPassport::routes($app, ['prefix' => 'api/v1/user/oauth']);
 \Laravel\Passport\Passport::tokensExpireIn(\Carbon\Carbon::now()->addMinutes(15), 2);
 \Laravel\Passport\Passport::refreshTokensExpireIn(\Carbon\Carbon::now()->addMinutes(60), 2);
+\Laravel\Passport\Passport::hashClientSecrets();
 
 return $app;

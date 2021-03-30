@@ -13,7 +13,8 @@ if [ -f "$privkey" ] && [ -f "$pubkey" ]; then
   echo "Passport key files already exist. No need to run php artisan passport:install."
   exit 0
 else
-  php artisan passport:install --force
+  php artisan passport:install --force -vvv > /var/www/html/passport_output.txt
+  chmod 644 /var/www/html/passport_output.txt
   if [ $? != 0 ]; then 
     echo "Passport install error. Exiting with error."
     exit 1
