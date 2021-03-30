@@ -133,5 +133,6 @@ $app->router->group([
 \Dusterio\LumenPassport\LumenPassport::routes($app, ['prefix' => 'api/v1/user/oauth']);
 \Laravel\Passport\Passport::tokensExpireIn(\Carbon\Carbon::now()->addMinutes(15), 2);
 \Laravel\Passport\Passport::refreshTokensExpireIn(\Carbon\Carbon::now()->addMinutes(60), 2);
+\Laravel\Passport\Passport::hashClientSecrets();
 
 return $app;
