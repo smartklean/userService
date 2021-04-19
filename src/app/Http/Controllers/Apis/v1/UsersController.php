@@ -28,35 +28,58 @@ class UsersController extends Controller
             ], 200);
     }
 
-    public function fetch($limit = null){
-      if(!$limit)
-        $users = User::all();
-      else
-        $users = User::paginate($limit);
+    public function fetch(Request $request, $limit = null){
+      $rules = [
+          "params" => "nullable|array",
+          "params.*" => "nullable|distinct"
+      ];
+
+      $validator = Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return response()->json([
+          'status' => false,
+          'error' => __('response.errors.request'),
+          'message' => __('response.messages.validation'),
+          'data' => [
+            'errors' => $validator->getMessageBag()->toArray()
+          ]
+        ], 400);
+      }
+
+      $params = $request->input('params');
+
+      if($params){
+        $users = [];
+
+        foreach($params as $param){
+          $user = User::where([
+            'id' => $param
+          ])
+          ->orWhere([
+            'email' => $param
+          ])
+          ->orWhere([
+            'phone_number' => $param
+          ])->first();
+
+          array_push($users, $user);
+        }
+      }else{
+        if(!$limit){
+          $users = User::all();
+        }
+        else{
+          $users = User::paginate($limit);
+        }
+      }
+
 
       return UserResource::collection($users)
               ->additional([
                 'status' => true,
                 'message' => __('response.messages.found_multiple', ['attr' => 'users']),
               ], 200);
-    }
-
-    public function fetchSingle($id){
-      $user = User::find($id);
-
-      if(!$user){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.not_found', ['attr' => 'user']),
-        ], 400);
-      }
-
-      return (new UserResource($user))
-            ->additional([
-              'status' => true,
-              'message' => __('response.messages.found', ['attr' => 'user']),
-            ], 200);
     }
 
     public function store(Request $request){
