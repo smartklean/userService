@@ -63,22 +63,6 @@ class UsersTest extends TestCase
         ]);
     }
 
-    public function testFetchSingleUser()
-    {
-        $user = User::factory()->raw();
-
-        $user = User::create($user);
-
-        $this->get('/api/v1/user/'.$user->id.'/get');
-
-        $this->seeStatusCode(200);
-        $this->seeJsonStructure([
-          'status',
-          'data',
-          'message'
-        ]);
-    }
-
     public function testFetchAllUsers()
     {
         $this->get('/api/v1/user/get');
