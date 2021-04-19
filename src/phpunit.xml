@@ -5,6 +5,7 @@
         <env name="USERSWS_CACHE_DRIVER" value="array"/>
         <env name="USERSWS_QUEUE_CONNECTION" value="sync"/>
         <env name="USERSWS_DB_CONNECTION" value="mysql_test"/>
+        <env name="XDEBUG_MODE" value="coverage" />
     </php>
     <logging>
         <junit outputFile="test-reports/phpunit.junit.xml"/>

@@ -49,7 +49,6 @@ $router->group([
       'prefix' => 'user',
     ], function() use ($router) {
       $router->get('/get[/{limit}]', 'Apis\v1\UsersController@fetch');
-      $router->get('/{id}/get', 'Apis\v1\UsersController@fetchSingle');
       $router->put('/{id}/update', 'Apis\v1\UsersController@update');
       $router->post('/create', 'Apis\v1\UsersController@store');
       $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
