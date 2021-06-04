@@ -91,13 +91,6 @@ $app->routeMiddleware([
     'client' => \Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
 ]);
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
-
-$app->register(Laravel\Passport\PassportServiceProvider::class);
-$app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
-
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -108,6 +101,9 @@ $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 | totally optional, so you are not required to uncomment this line.
 |
 */
+
+$app->register(Laravel\Passport\PassportServiceProvider::class);
+$app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);

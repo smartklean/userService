@@ -9,32 +9,37 @@ use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\HandlesJsonResponse;
 
 class VerifyEmailController extends Controller
 {
+    use HandlesJsonResponse;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
 
-     public function __construct(){
-       define('ERR', 'response.errors.request');
-       define('ERR_NOT_FOUND', 'response.messages.not_found');
-     }
+     private $verificationCodeSentMessage = 'response.messages.verification_code_sent';
+     private $verifiedMessage = 'response.messages.verified';
+     private $notFoundMessage = 'response.messages.not_found';
+     private $notVerifiedMessage = 'response.messages.not_verified';
+     private $error = 'response.errors.request';
+     private $notFoundError = 'response.errors.not_found';
+     private $errorCode = 'response.codes.error';
+     private $successCode = 'response.codes.success';
+     private $notFoundErrorCode = 'response.codes.not_found_error';
+     private $userAttribute = 'user';
 
      public function verifyEmail(Request $request){
-       $user = $request->user();
+       $user = User::where('email', $request->email)->first();
 
        if(!$user){
-         return response()->json([
-           'status' => false,
-           'error' => __(ERR),
-           'message' => __(ERR_NOT_FOUND, ['attr' => 'user'])
-         ], 400);
+         return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
        }
 
-       if(Hash::check($request->input('email_verification_code'), $user->email_verification_code)){
+       if(Hash::check($request->email_verification_code, $user->email_verification_code)){
            if(strtotime('-15 minutes') - strtotime($user->updated_at) < 0){
              $user->email_verification_code = null;
              $user->email_verified_at = Carbon::now();
@@ -43,28 +48,17 @@ class VerifyEmailController extends Controller
              return (new UserResource($user))
                    ->additional([
                      'status' => true,
-                     'message' => __('response.messages.verified', ['attr' => 'user'])
+                     'code' => __($this->successCode),
+                     'message' => __($this->verifiedMessage, ['attr' => $this->userAttribute])
                    ], 200);
            }
        }
 
-       return response()->json([
-         'status' => false,
-         'error' => __(ERR),
-         'message' => __('response.messages.not_verified', ['attr' => 'user'])
-       ], 400);
+       return $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
      }
 
      public function resendVerificationCode(Request $request){
        $user = $request->user();
-
-       if(!$user){
-         return response()->json([
-           'status' => false,
-           'error' => __(ERR),
-           'message' => __(ERR_NOT_FOUND, ['attr' => 'user'])
-         ], 400);
-       }
 
        $unhashedEmailVerificationCode = str_shuffle(uniqid().uniqid());
 
@@ -77,12 +71,11 @@ class VerifyEmailController extends Controller
 
        $user->save();
 
-       // trigger email notification service
-
        return (new UserResource($user))
              ->additional([
                'status' => true,
-               'message' => __('response.messages.verification_code_sent'),
+               'code' => __($this->successCode),
+               'message' => __($this->verificationCodeSentMessage),
                'email_verification_code' => $unhashedEmailVerificationCode
              ], 200);
      }
