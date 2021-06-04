@@ -18,9 +18,10 @@ class AccessTokensController extends Controller
      *
      * @return void
      */
-    public function __construct(){
-      define('TOKEN_ENDPOINT', config('app.docker_internal').'/api/v1/user/oauth/token');
-    }
+    private $tokenEndpoint = '/api/v1/user/oauth/token';
+    private $errorCode = 'response.codes.error';
+    private $successCode = 'response.codes.success';
+    private $appDockerInternal = 'app.docker_internal';
 
     public function authenticate(Request $request){
       $user = User::where('email', $request->input('email'))->first();
@@ -31,14 +32,10 @@ class AccessTokensController extends Controller
         $passwordIsValid = false;
 
       if(!$user || !$passwordIsValid){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.unauthenticated'),
-          'messsage' => __('response.messages.unauthenticated'),
-        ], 401);
+        return $this->jsonResponse(__('response.messages.unauthenticated'), __('response.codes.unauthenticated'), 401, [], __('response.errors.unauthenticated'));
       }
 
-      $res = Http::asForm()->post(TOKEN_ENDPOINT, [
+      $res = Http::asForm()->post(config($this->appDockerInternal).$this->tokenEndpoint, [
           'grant_type' => 'password',
           'client_id' => $request->header('Client-Public'),
           'client_secret' => $request->header('Client-Secret'),
@@ -50,16 +47,13 @@ class AccessTokensController extends Controller
       $response = json_decode($res, true);
 
       if($res->status() !== 200){
-        return response()->json([
-          'status' => false,
-          'error' => $response['error'],
-          'message' => $response['message']
-        ], 400);
+        return $this->jsonResponse($response['message'], __($this->errorCode), 400, [], $response['error']);
       }
 
       return (new UserResource($user))
             ->additional([
               'status' => true,
+              'code' => __($this->successCode),
               'message' => __('response.messages.authenticated'),
               'token' => $response
             ], 200);
@@ -67,14 +61,6 @@ class AccessTokensController extends Controller
 
     public function revokeToken(Request $request){
       $user = $request->user();
-
-      if(!$user){
-        return response()->json([
-          'status' => false,
-          'error' => __('response.errors.request'),
-          'message' => __('response.messages.not_found', ['attr' => 'user'])
-        ], 400);
-      }
 
       $tokenRepository = app(TokenRepository::class);
       $refreshTokenRepository = app(RefreshTokenRepository::class);
@@ -86,12 +72,13 @@ class AccessTokensController extends Controller
 
       return response()->json([
         'status' => true,
+        'code' => __($this->successCode),
         'message' => __('response.messages.token_revoked')
       ], 200);
     }
 
     public function refreshToken(Request $request){
-      $res = Http::asForm()->post(TOKEN_ENDPOINT, [
+      $res = Http::asForm()->post(config($this->appDockerInternal).$this->tokenEndpoint, [
           'grant_type' => 'refresh_token',
           'refresh_token' => $request->header('Refresh-Token'),
           'client_id' => $request->header('Client-Public'),
@@ -103,15 +90,12 @@ class AccessTokensController extends Controller
       $response = json_decode($res, true);
 
       if($res->status() !== 200){
-        return response()->json([
-          'status' => false,
-          'error' => $response['error'],
-          'message' => $response['message']
-        ], 400);
+        return $this->jsonResponse($response['message'], __($this->errorCode), 400, [], $response['error']);
       }
 
       return response()->json([
         'status' => true,
+        'code' => __($this->successCode),
         'message' => __('response.messages.token_reset'),
         'token' => $response
       ], 200);

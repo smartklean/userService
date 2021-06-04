@@ -10,19 +10,25 @@ use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\HandlesJsonResponse;
 
 class PasswordController extends Controller
 {
+    use HandlesJsonResponse;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
 
-    public function __construct(){
-      define('ERR', 'response.errors.request');
-      define('ERR_NOT_FOUND', 'response.messages.not_found');
-    }
+    private $error = 'response.errors.request';
+    private $notFoundMessage = 'response.messages.not_found';
+    private $notFoundError = 'response.errors.not_found';
+    private $errorCode = 'response.codes.error';
+    private $notFoundErrorCode = 'response.codes.not_found_error';
+    private $successCode = 'response.codes.success';
+    private $userAttribute = 'user';
+
 
     public function sendPasswordResetEmail(Request $request){
       $email = $request->input('email');
@@ -30,11 +36,7 @@ class PasswordController extends Controller
       $user = User::where('email', $email)->first();
 
       if(!$user){
-        return response()->json([
-          'status' => false,
-          'error' => __(ERR),
-          'message' => __(ERR_NOT_FOUND, ['attr' => 'user'])
-        ], 400);
+        return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
       }
 
       $token = str_shuffle(uniqid().uniqid());
@@ -53,11 +55,10 @@ class PasswordController extends Controller
 
       DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?)', [$email, $token, Carbon::now()]);
 
-      //trigger email notification service
-
       return (new UserResource($user))
             ->additional([
               'status' => true,
+              'code' => __($this->successCode),
               'message' => __('response.messages.password_email'),
               'token' => $unhashedToken
             ], 200);
@@ -69,11 +70,7 @@ class PasswordController extends Controller
         $user = User::where('email', $email)->first();
 
         if(!$user){
-          return response()->json([
-            'status' => false,
-            'error' => __(ERR),
-            'message' => __(ERR_NOT_FOUND, ['attr' => 'user'])
-          ], 400);
+          return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
         }
 
         $token = DB::table('password_resets')->where(['email' => $user->email])->first();
@@ -92,15 +89,12 @@ class PasswordController extends Controller
               return (new UserResource($user))
                     ->additional([
                       'status' => true,
+                      'code' => __($this->successCode),
                       'message' => __('response.messages.password_reset')
                     ], 200);
             }
         }
 
-        return response()->json([
-          'status' => false,
-          'error' => __(ERR),
-          'message' => __('response.messages.token_invalid')
-        ], 400);
+        return $this->jsonResponse(__('response.messages.token_invalid'), __($this->errorCode), 400, [], __($this->error));
     }
 }
