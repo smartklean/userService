@@ -28,10 +28,12 @@ class UsersController extends Controller
     private $deletedMessage = 'response.messages.deleted';
     private $updatedMessage = 'response.messages.updated';
     private $notFoundMessage = 'response.messages.not_found';
+    private $notValidMessage = 'response.messages.not_valid';
     private $notFoundError = 'response.errors.not_found';
     private $notFoundErrorCode = 'response.codes.not_found_error';
     private $successCode = 'response.codes.success';
     private $userAttribute = 'user';
+    private $userPassword = 'user password';
     private $usersAttribute = 'users';
     private $isRequiredString = 'required|string|max:255';
     private $isNullableString = 'nullable|string|max:255';
@@ -39,6 +41,8 @@ class UsersController extends Controller
     private $lastName = 'last_name';
     private $email = 'email';
     private $passwordString = 'password';
+    private $oldPassword = 'old_password';
+    private $newPassword = 'new_password';
     private $phoneNumber = 'phone_number';
     private $isDeveloper = 'is_developer';
     private $emailVerificationCodeString = 'email_verification_code';
@@ -202,5 +206,37 @@ class UsersController extends Controller
               'code' => __($this->successCode),
               $this->message => __($this->deletedMessage, ['attr' => $this->userAttribute]),
             ], 200);
+    }
+
+    public function changePassword(Request $request){
+      $rules = [
+        $this->oldPassword =>$this->isRequiredString,
+        $this->newPassword => $this->isRequiredString.'|confirmed',
+      ];
+
+      $validator =  Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return $this->jsonValidationError($validator);
+      }
+
+      $password = $request->input($this->oldPassword);
+
+      $user = User::find($request->id);
+
+      if (Hash::check($password, $user->password)) {
+        $user->fill([
+          $this->passwordString => Hash::make($request->input($this->newPassword)),
+        ])->save();
+  
+        return (new UserResource($user))
+              ->additional([
+                $this->status => true,
+                'code' => __($this->successCode),
+                $this->message => __($this->updatedMessage, ['attr' => $this->userPassword]),
+              ], 200);
+      }else{
+        return $this->jsonResponse(__($this->notValidMessage, ['attr' => 'Password you entered']), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+      }
     }
 }

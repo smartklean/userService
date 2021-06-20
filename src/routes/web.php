@@ -53,6 +53,7 @@ $router->group([
       $router->post('/create', 'Apis\v1\UsersController@store');
       $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
       $router->post('/authenticate', 'Apis\v1\AccessTokensController@authenticate');
+      $router->put('/change/password', 'Apis\v1\UsersController@changePassword');
 
       $router->group([
         'prefix' => 'token'

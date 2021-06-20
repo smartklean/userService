@@ -39,6 +39,7 @@ return [
     'found' => 'The :attr was retrived successfully.',
     'found_multiple' => 'The :attr were retrived successfully.',
     'not_found' => 'The :attr was not found.',
+    'not_valid' => 'The :attr is invalid please try again.',
     'not_found_multiple' => 'The :attr were not found.',
     'available' => 'The :attr is available.',
     'not_available' => 'The :attr is not available.',
