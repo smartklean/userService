@@ -240,5 +240,6 @@ class UsersController extends Controller
       }
 
       return $response;
+      
     }
 }
