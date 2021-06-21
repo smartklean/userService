@@ -229,14 +229,16 @@ class UsersController extends Controller
           $this->passwordString => Hash::make($request->input($this->newPassword)),
         ])->save();
   
-        return (new UserResource($user))
+        $response =  (new UserResource($user))
               ->additional([
                 $this->status => true,
                 'code' => __($this->successCode),
                 $this->message => __($this->updatedMessage, ['attr' => $this->userPassword]),
               ], 200);
       }else{
-        return $this->jsonResponse(__($this->notValidMessage, ['attr' => 'Password you entered']), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+        $response = $this->jsonResponse(__($this->notValidMessage, ['attr' => 'Password you entered']), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
       }
+
+      return $response;
     }
 }
