@@ -60,8 +60,6 @@ class Handler extends ExceptionHandler
                  $response['trace'] = $exception->getTrace();
              }
 
-             $status = 400;
-
              if($exception instanceof ValidationException){
                  return $this->convertValidationExceptionToResponse($exception, $request);
              }else if($exception instanceof AuthenticationException){
@@ -82,7 +80,6 @@ class Handler extends ExceptionHandler
              }
 
              return response()->json($response,$status);
-
          }
      }
 }

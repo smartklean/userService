@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Traits\HandlesJsonResponse;
+use App\Traits\HandlesJsonResponse;
 
 class PasswordController extends Controller
 {
@@ -27,8 +28,17 @@ class PasswordController extends Controller
     private $errorCode = 'response.codes.error';
     private $notFoundErrorCode = 'response.codes.not_found_error';
     private $successCode = 'response.codes.success';
+    private $isRequiredString = 'required|string|max:255';
+    private $isRequiredEmail = 'required|string|email|max:255';
+    private $passwordString = 'password';
     private $userAttribute = 'user';
-
+    private $userPassword = 'user password';
+    private $oldPassword = 'old_password';
+    private $newPassword = 'new_password';
+    private $updatedMessage = 'response.messages.updated';
+    private $notValidMessage = 'response.messages.not_valid';
+    private $status = 'status';
+    private $message = 'message';
 
     public function sendPasswordResetEmail(Request $request){
       $email = $request->input('email');
@@ -57,14 +67,26 @@ class PasswordController extends Controller
 
       return (new UserResource($user))
             ->additional([
-              'status' => true,
+              $this->status => true,
               'code' => __($this->successCode),
-              'message' => __('response.messages.password_email'),
+              $this->message => __('response.messages.password_email'),
               'token' => $unhashedToken
             ], 200);
     }
 
     public function resetPassword(Request $request){
+        $rules = [
+          'email' => $this->isRequiredEmail,
+          'password' => $this->isRequiredString.'|confirmed',
+          'token' => $this->isRequiredString,
+        ];
+
+        $validator =  Validator::make($request->all(), $rules);
+
+        if($validator->fails()){
+          return $this->jsonValidationError($validator);
+        }
+
         $email = $request->input('email');
 
         $user = User::where('email', $email)->first();
@@ -88,13 +110,47 @@ class PasswordController extends Controller
 
               return (new UserResource($user))
                     ->additional([
-                      'status' => true,
+                      $this->status => true,
                       'code' => __($this->successCode),
-                      'message' => __('response.messages.password_reset')
+                      $this->message => __('response.messages.password_reset')
                     ], 200);
             }
         }
 
         return $this->jsonResponse(__('response.messages.token_invalid'), __($this->errorCode), 400, [], __($this->error));
+    }
+
+    public function changePassword(Request $request){
+      $rules = [
+        $this->oldPassword =>$this->isRequiredString,
+        $this->newPassword => $this->isRequiredString.'|confirmed',
+      ];
+
+      $validator =  Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return $this->jsonValidationError($validator);
+      }
+
+      $password = $request->input($this->oldPassword);
+
+      $user = $request->user();
+
+      if (Hash::check($password, $user->password)) {
+        $user->fill([
+          $this->passwordString => Hash::make($request->input($this->newPassword)),
+        ])->save();
+
+        $response =  (new UserResource($user))
+              ->additional([
+                $this->status => true,
+                'code' => __($this->successCode),
+                $this->message => __($this->updatedMessage, ['attr' => $this->userPassword]),
+              ], 200);
+      }else{
+        $response = $this->jsonResponse(__($this->notValidMessage, ['attr' => 'Password you entered']), __($this->errorCode), 400, [], __($this->error));
+      }
+
+      return $response;
     }
 }
