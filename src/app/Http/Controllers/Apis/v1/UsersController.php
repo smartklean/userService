@@ -26,15 +26,13 @@ class UsersController extends Controller
     private $foundMultipleMessage = 'response.messages.found_multiple';
     private $addedMessage = 'response.messages.added';
     private $foundMessage = 'response.messages.found';
-    private $deletedMessage = 'response.messages.deleted';
     private $updatedMessage = 'response.messages.updated';
+    private $deletedMessage = 'response.messages.deleted';
     private $notFoundMessage = 'response.messages.not_found';
-    private $notValidMessage = 'response.messages.not_valid';
     private $notFoundError = 'response.errors.not_found';
     private $notFoundErrorCode = 'response.codes.not_found_error';
     private $successCode = 'response.codes.success';
     private $userAttribute = 'user';
-    private $userPassword = 'user password';
     private $usersAttribute = 'users';
     private $isRequiredString = 'required|string|max:255';
     private $isNullableString = 'nullable|string|max:255';
@@ -42,8 +40,6 @@ class UsersController extends Controller
     private $lastName = 'last_name';
     private $email = 'email';
     private $passwordString = 'password';
-    private $oldPassword = 'old_password';
-    private $newPassword = 'new_password';
     private $phoneNumber = 'phone_number';
     private $isDeveloper = 'is_developer';
     private $emailVerificationCodeString = 'email_verification_code';
@@ -107,6 +103,10 @@ class UsersController extends Controller
         $this->phoneNumber => $request->input($this->phoneNumber)
       ]);
 
+      if($request->is_developer){
+        //assign user the role of developer
+      }
+
       return (new UserResource($user))
             ->additional([
               $this->status => true,
@@ -127,14 +127,26 @@ class UsersController extends Controller
         $this->firstName => $this->isNullableString,
         $this->lastName => $this->isNullableString,
         $this->email => 'nullable|email|max:255|unique:users,email,'.$user->id,
-        $this->phoneNumber => $this->isNullableString.'|unique:users,phone_number,'.$user->id,
-        $this->isDeveloper => 'nullable|boolean',
+        $this->phoneNumber => $this->isNullableString.'|unique:users,phone_number,'.$user->id
       ];
 
       $validator =  Validator::make($request->all(), $rules);
 
       if($validator->fails()){
         return $this->jsonValidationError($validator);
+      }
+
+      $unhashedEmailVerificationCode = null;
+
+      if($request->email != $user->email){
+        $unhashedEmailVerificationCode = str_shuffle(uniqid().uniqid());
+
+        $emailVerificationCode = Hash::make($unhashedEmailVerificationCode);
+
+        $emailVerifiedAt = null;
+
+        $user->email_verification_code = $emailVerificationCode;
+        $user->email_verified_at = $emailVerifiedAt;
       }
 
       $user->fill([
@@ -144,14 +156,11 @@ class UsersController extends Controller
         $this->phoneNumber => $request->input($this->phoneNumber) ? $request->input($this->phoneNumber) : $user->phone_number,
       ])->save();
 
-      if($request->is_developer){
-        //assign user the role of developer
-      }
-
       return (new UserResource($user))
             ->additional([
               $this->status => true,
               'code' => __($this->successCode),
+              'email_verification_code' => $unhashedEmailVerificationCode,
               $this->message => __($this->updatedMessage, ['attr' => $this->userAttribute]),
             ], 200);
     }
@@ -173,40 +182,5 @@ class UsersController extends Controller
               'code' => __($this->successCode),
               $this->message => __($this->deletedMessage, ['attr' => $this->userAttribute]),
             ], 200);
-    }
-
-    public function changePassword(Request $request){
-      $rules = [
-        $this->oldPassword =>$this->isRequiredString,
-        $this->newPassword => $this->isRequiredString.'|confirmed',
-      ];
-
-      $validator =  Validator::make($request->all(), $rules);
-
-      if($validator->fails()){
-        return $this->jsonValidationError($validator);
-      }
-
-      $password = $request->input($this->oldPassword);
-
-      $user = User::find($request->id);
-
-      if (Hash::check($password, $user->password)) {
-        $user->fill([
-          $this->passwordString => Hash::make($request->input($this->newPassword)),
-        ])->save();
-
-        $response =  (new UserResource($user))
-              ->additional([
-                $this->status => true,
-                'code' => __($this->successCode),
-                $this->message => __($this->updatedMessage, ['attr' => $this->userPassword]),
-              ], 200);
-      }else{
-        $response = $this->jsonResponse(__($this->notValidMessage, ['attr' => 'Password you entered']), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
-      }
-
-      return $response;
-
     }
 }

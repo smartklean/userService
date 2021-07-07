@@ -49,11 +49,10 @@ $router->group([
       'prefix' => 'user',
     ], function() use ($router) {
       $router->get('/', 'Apis\v1\UsersController@fetch');
-      $router->put('/{id}/update', 'Apis\v1\UsersController@update');
+      $router->put('/{id}', 'Apis\v1\UsersController@update');
       $router->post('/', 'Apis\v1\UsersController@store');
       $router->delete('/{id}', 'Apis\v1\UsersController@destroy');
       $router->post('/authenticate', 'Apis\v1\AccessTokensController@authenticate');
-      $router->put('/change/password', 'Apis\v1\UsersController@changePassword');
 
       $router->group([
         'prefix' => 'token'
@@ -62,8 +61,8 @@ $router->group([
           'middleware' => 'auth:api'
         ], function() use ($router) {
           $router->get('/validate', 'Apis\v1\UsersController@fetchUserInstance');
+          $router->post('/revoke', 'Apis\v1\AccessTokensController@revokeToken');
         });
-        $router->post('/revoke', 'Apis\v1\AccessTokensController@revokeToken');
         $router->post('/refresh', 'Apis\v1\AccessTokensController@refreshToken');
       });
 
@@ -72,12 +71,21 @@ $router->group([
       ], function() use ($router) {
         $router->post('/email', 'Apis\v1\PasswordController@sendPasswordResetEmail');
         $router->post('/reset', 'Apis\v1\PasswordController@resetPassword');
+        $router->group([
+          'middleware' => 'auth:api'
+        ], function() use ($router) {
+          $router->put('/change', 'Apis\v1\PasswordController@changePassword');
+        });
       });
 
       $router->group([
         'prefix' => 'email'
       ], function() use ($router) {
-        $router->post('/resend', 'Apis\v1\VerifyEmailController@resendVerificationCode');
+        $router->group([
+          'middleware' => 'auth:api'
+        ], function() use ($router) {
+          $router->post('/resend', 'Apis\v1\VerifyEmailController@resendVerificationCode');
+        });
         $router->post('/verify', 'Apis\v1\VerifyEmailController@verifyEmail');
       });
     });
