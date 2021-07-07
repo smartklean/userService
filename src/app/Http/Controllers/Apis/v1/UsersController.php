@@ -11,11 +11,12 @@ use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Traits\HandlesJsonResponse;
+use App\Traits\HandlesUser;
+use App\Traits\HandlesJsonResponse;
 
 class UsersController extends Controller
 {
-    use HandlesJsonResponse;
+    use HandlesUser, HandlesJsonResponse;
     /**
      * Create a new controller instance.
      *
@@ -59,44 +60,8 @@ class UsersController extends Controller
             ], 200);
     }
 
-    public function fetch(Request $request, $limit = null){
-      $rules = [
-          "params" => "nullable|array",
-          "params.*" => "nullable|distinct"
-      ];
-
-      $validator = Validator::make($request->all(), $rules);
-
-      if($validator->fails()){
-        return $this->jsonValidationError($validator);
-      }
-
-      $params = $request->input('params');
-
-      if($params){
-        $users = [];
-
-        foreach($params as $param){
-          $user = User::where([
-            'id' => $param
-          ])
-          ->orWhere([
-            $this->email => $param
-          ])
-          ->orWhere([
-            $this->phoneNumber => $param
-          ])->first();
-
-          array_push($users, $user);
-        }
-      }else{
-        if(!$limit){
-          $users = User::all();
-        }
-        else{
-          $users = User::paginate($limit);
-        }
-      }
+    public function fetch(Request $request){
+      $users = $this->fetchUser($request);
 
       return UserResource::collection($users)
               ->additional([
@@ -139,8 +104,7 @@ class UsersController extends Controller
         $this->emailVerificationCodeString => $emailVerificationCode,
         'email_verified_at' => $emailVerifiedAt,
         $this->passwordString => $password,
-        $this->phoneNumber => $request->input($this->phoneNumber),
-        $this->isDeveloper => $request->input($this->isDeveloper) ? $request->input($this->isDeveloper) : false,
+        $this->phoneNumber => $request->input($this->phoneNumber)
       ]);
 
       return (new UserResource($user))
@@ -178,8 +142,11 @@ class UsersController extends Controller
         $this->lastName => $request->input($this->lastName) ? $request->input($this->lastName) : $user->last_name,
         $this->email => $request->input($this->email) ? $request->input($this->email) : $user->email,
         $this->phoneNumber => $request->input($this->phoneNumber) ? $request->input($this->phoneNumber) : $user->phone_number,
-        $this->isDeveloper => $request->input($this->isDeveloper) ? $request->input($this->isDeveloper) : $user->is_developer,
       ])->save();
+
+      if($request->is_developer){
+        //assign user the role of developer
+      }
 
       return (new UserResource($user))
             ->additional([
@@ -228,7 +195,7 @@ class UsersController extends Controller
         $user->fill([
           $this->passwordString => Hash::make($request->input($this->newPassword)),
         ])->save();
-  
+
         $response =  (new UserResource($user))
               ->additional([
                 $this->status => true,
@@ -240,6 +207,6 @@ class UsersController extends Controller
       }
 
       return $response;
-      
+
     }
 }

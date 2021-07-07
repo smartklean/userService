@@ -48,10 +48,10 @@ $router->group([
     $router->group([
       'prefix' => 'user',
     ], function() use ($router) {
-      $router->get('/get[/{limit}]', 'Apis\v1\UsersController@fetch');
+      $router->get('/', 'Apis\v1\UsersController@fetch');
       $router->put('/{id}/update', 'Apis\v1\UsersController@update');
-      $router->post('/create', 'Apis\v1\UsersController@store');
-      $router->delete('/{id}/delete', 'Apis\v1\UsersController@destroy');
+      $router->post('/', 'Apis\v1\UsersController@store');
+      $router->delete('/{id}', 'Apis\v1\UsersController@destroy');
       $router->post('/authenticate', 'Apis\v1\AccessTokensController@authenticate');
       $router->put('/change/password', 'Apis\v1\UsersController@changePassword');
 

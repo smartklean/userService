@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Traits\HandlesJsonResponse;
+use App\Traits\HandlesJsonResponse;
 
 class PasswordController extends Controller
 {

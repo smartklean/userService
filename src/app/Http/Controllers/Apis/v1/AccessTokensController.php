@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Laravel\Passport\TokenRepository;
 use Laravel\Passport\RefreshTokenRepository;
-use App\Http\Traits\HandlesJsonResponse;
+use App\Traits\HandlesJsonResponse;
 
 class AccessTokensController extends Controller
 {
