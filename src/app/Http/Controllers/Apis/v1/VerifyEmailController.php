@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\v1;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
@@ -31,8 +32,19 @@ class VerifyEmailController extends Controller
      private $successCode = 'response.codes.success';
      private $notFoundErrorCode = 'response.codes.not_found_error';
      private $userAttribute = 'user';
+     private $isRequiredEmail = 'required|string|email|max:255';
 
      public function verifyEmail(Request $request){
+       $rules = [
+         'email' => $this->isRequiredEmail
+       ];
+
+       $validator =  Validator::make($request->all(), $rules);
+
+       if($validator->fails()){
+         return $this->jsonValidationError($validator);
+       }
+
        $user = User::where('email', $request->email)->first();
 
        if(!$user){
