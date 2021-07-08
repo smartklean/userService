@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\v1;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
@@ -31,8 +32,19 @@ class VerifyEmailController extends Controller
      private $successCode = 'response.codes.success';
      private $notFoundErrorCode = 'response.codes.not_found_error';
      private $userAttribute = 'user';
+     private $isRequiredEmail = 'required|string|email|max:255';
 
      public function verifyEmail(Request $request){
+       $rules = [
+         'email' => $this->isRequiredEmail
+       ];
+
+       $validator =  Validator::make($request->all(), $rules);
+
+       if($validator->fails()){
+         return $this->jsonValidationError($validator);
+       }
+
        $user = User::where('email', $request->email)->first();
 
        if(!$user){
@@ -45,16 +57,20 @@ class VerifyEmailController extends Controller
              $user->email_verified_at = Carbon::now();
              $user->save();
 
-             return (new UserResource($user))
+             $response = (new UserResource($user))
                    ->additional([
                      'status' => true,
                      'code' => __($this->successCode),
                      'message' => __($this->verifiedMessage, ['attr' => $this->userAttribute])
                    ], 200);
+           }else{
+             $response = $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
            }
+       }else{
+         $response = $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
        }
 
-       return $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
+       return $response;
      }
 
      public function resendVerificationCode(Request $request){
