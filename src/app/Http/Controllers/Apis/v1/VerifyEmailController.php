@@ -57,16 +57,20 @@ class VerifyEmailController extends Controller
              $user->email_verified_at = Carbon::now();
              $user->save();
 
-             return (new UserResource($user))
+             $response = (new UserResource($user))
                    ->additional([
                      'status' => true,
                      'code' => __($this->successCode),
                      'message' => __($this->verifiedMessage, ['attr' => $this->userAttribute])
                    ], 200);
+           }else{
+             $response = $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
            }
+       }else{
+         $response = $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
        }
 
-       return $this->jsonResponse(__($this->notVerifiedMessage, ['attr' => $this->userAttribute]), __($this->errorCode), 400, [], __($this->error));
+       return $response;
      }
 
      public function resendVerificationCode(Request $request){
