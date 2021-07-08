@@ -138,7 +138,7 @@ class UsersController extends Controller
 
       $unhashedEmailVerificationCode = null;
 
-      if($request->email != $user->email){
+      if(isset($request->email) && $request->email != $user->email){
         $unhashedEmailVerificationCode = str_shuffle(uniqid().uniqid());
 
         $emailVerificationCode = Hash::make($unhashedEmailVerificationCode);
