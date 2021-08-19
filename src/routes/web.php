@@ -49,6 +49,9 @@ $router->group([
       'prefix' => 'user',
     ], function() use ($router) {
       $router->get('/', 'Apis\v1\UsersController@fetch');
+      $router->get('/{id}', 'Apis\v1\UsersController@fetchSingle');
+      $router->post('/partial', 'Apis\v1\UsersController@findOrCreate');
+      $router->put('/partial/{id}', 'Apis\v1\UsersController@updatePartialUser');
       $router->put('/{id}', 'Apis\v1\UsersController@update');
       $router->post('/', 'Apis\v1\UsersController@store');
       $router->delete('/{id}', 'Apis\v1\UsersController@destroy');

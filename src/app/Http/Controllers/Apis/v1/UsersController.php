@@ -57,6 +57,10 @@ class UsersController extends Controller
     }
 
     public function fetch(Request $request){
+      if($request->email){
+        return $this->findByEmail($request->email);
+      }
+
       $users = $this->fetchUser($request);
 
       return UserResource::collection($users)
@@ -65,6 +69,21 @@ class UsersController extends Controller
                 'code' => __($this->successCode),
                 $this->message => __($this->foundMultipleMessage, ['attr' => $this->usersAttribute]),
               ], 200);
+    }
+
+    public function fetchSingle($id){
+      $user = User::find($id);
+
+      if(!$user){
+        return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+      }
+
+      return (new UserResource($user))
+            ->additional([
+              $this->status => true,
+              'code' => __($this->successCode),
+              $this->message => __($this->foundMessage, ['attr' => $this->userAttribute]),
+            ], 200);
     }
 
     public function store(Request $request){
@@ -103,10 +122,6 @@ class UsersController extends Controller
         $this->phoneNumber => $request->input($this->phoneNumber)
       ]);
 
-      if($request->is_developer){
-        //assign user the role of developer
-      }
-
       return (new UserResource($user))
             ->additional([
               $this->status => true,
@@ -114,6 +129,56 @@ class UsersController extends Controller
               $this->message => __($this->addedMessage, ['attr' => 'user']),
               $this->emailVerificationCodeString => $unhashedEmailVerificationCode
             ], 201);
+    }
+
+    private function findByEmail($email){
+      $user = User::where('email', $email)->first();
+
+      if(!$user){
+        return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+      }
+
+      return (new UserResource($user))
+            ->additional([
+              $this->status => true,
+              'code' => __($this->successCode),
+              $this->message => __($this->foundMessage, ['attr' => 'user']),
+            ], 200);
+    }
+
+    public function findOrCreate(Request $request){
+      $rules = [
+        'email' => 'required|string|email|max:255'
+      ];
+
+      $validator = Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return $this->jsonValidationError($validator);
+      }
+
+      $email = $request->email;
+
+      $user = User::where('email', $email)->first();
+
+      if(!$user){
+        $user = User::create([
+          'email' => $email
+        ]);
+
+        $httpCode = 201;
+        $message = __($this->addedMessage, ['attr' => 'user']);
+      }else{
+        $httpCode = 200;
+        $message = __($this->foundMessage, ['attr' => 'user']);
+      }
+
+      return (new UserResource($user))
+            ->additional([
+              $this->status => true,
+              'code' => __($this->successCode),
+              $this->message => $message
+            ], $httpCode);
     }
 
     public function update(Request $request, $id){
@@ -162,6 +227,52 @@ class UsersController extends Controller
               'code' => __($this->successCode),
               'email_verification_code' => $unhashedEmailVerificationCode,
               $this->message => __($this->updatedMessage, ['attr' => $this->userAttribute]),
+            ], 200);
+    }
+
+    public function updatePartialUser(Request $request, $id){
+      $user = User::find($id);
+
+      if(!$user){
+        return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+      }
+
+      $rules = [
+        $this->firstName => $this->isRequiredString,
+        $this->lastName => $this->isRequiredString,
+        $this->passwordString => $this->isRequiredString.'|confirmed',
+        $this->phoneNumber => $this->isRequiredString.'|unique:users,phone_number,'.$user->id
+      ];
+
+      $validator =  Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return $this->jsonValidationError($validator);
+      }
+
+      $password = Hash::make($request->input($this->passwordString));
+
+      $unhashedEmailVerificationCode = str_shuffle(uniqid().uniqid());
+
+      $emailVerificationCode = Hash::make($unhashedEmailVerificationCode);
+
+      $emailVerifiedAt = null;
+
+      $user->fill([
+        $this->firstName => $request->input($this->firstName),
+        $this->lastName => $request->input($this->lastName),
+        $this->emailVerificationCodeString => $emailVerificationCode,
+        'email_verified_at' => $emailVerifiedAt,
+        $this->passwordString => $password,
+        $this->phoneNumber => $request->input($this->phoneNumber)
+      ])->save();
+
+      return (new UserResource($user))
+            ->additional([
+              $this->status => true,
+              'code' => __($this->successCode),
+              $this->message => __($this->updatedMessage, ['attr' => 'user']),
+              $this->emailVerificationCodeString => $unhashedEmailVerificationCode
             ], 200);
     }
 
