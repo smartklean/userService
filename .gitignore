@@ -1,5 +1,6 @@
 /db_password.txt
 /db_root_password.txt
+/.DS_Store
 /src/node_modules
 /src/vendor
 /src/.env
@@ -10,3 +11,4 @@
 /src/npm-debug.log
 /src/yarn-error.log
 /src/.phpunit.result.cache
+/src/.DS_Store
