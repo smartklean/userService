@@ -29,7 +29,7 @@ class PasswordController extends Controller
     private $notFoundErrorCode = 'response.codes.not_found_error';
     private $successCode = 'response.codes.success';
     private $isRequiredString = 'required|string|max:255';
-    private $isRequiredPassword = 'required|string|min:6|max:255|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed';
+    private $isRequiredCustomString = 'required|string|min:6|max:255|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed';
     private $isRequiredEmail = 'required|string|email|max:255';
     private $passwordString = 'password';
     private $userAttribute = 'user';
@@ -78,7 +78,7 @@ class PasswordController extends Controller
     public function resetPassword(Request $request){
         $rules = [
           'email' => $this->isRequiredEmail,
-          'password' => $this->isRequiredPassword,
+          'password' => $this->isRequiredCustomString,
           'token' => $this->isRequiredString,
         ];
 
@@ -124,7 +124,7 @@ class PasswordController extends Controller
     public function changePassword(Request $request){
       $rules = [
         $this->oldPassword =>$this->isRequiredString,
-        $this->newPassword =>$this->isRequiredPassword,
+        $this->newPassword =>$this->isRequiredCustomString,
       ];
 
       $validator =  Validator::make($request->all(), $rules);
