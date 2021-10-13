@@ -240,7 +240,7 @@ class UsersController extends Controller
       $rules = [
         $this->firstName => $this->isRequiredString,
         $this->lastName => $this->isRequiredString,
-        $this->passwordString => $this->isRequiredString.'|confirmed',
+        $this->passwordString => $this->isRequiredString.'|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed',
         $this->phoneNumber => $this->isRequiredString.'|unique:users,phone_number,'.$user->id
       ];
 
