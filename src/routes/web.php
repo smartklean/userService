@@ -20,7 +20,7 @@ $router->get('/', function() {
       return response()->json([
         'status' => true,
         'data' => [
-          'key' => Illuminate\Support\Str::random(32),
+          'key' => 'base64:'.base64_encode(Illuminate\Support\Str::random(32)),
         ],
         'message' => 'Welcome to CashEnvoy!'
       ], 200);
@@ -48,6 +48,18 @@ $router->group([
     $router->group([
       'prefix' => 'user',
     ], function() use ($router) {
+      $router->group([
+        'prefix' => 'password'
+      ], function() use ($router) {
+        $router->group([
+          'middleware' => 'auth:api'
+        ], function() use ($router) {
+          $router->put('/', 'Apis\v1\PasswordController@changePassword');
+        });
+        $router->post('/email', 'Apis\v1\PasswordController@sendPasswordResetEmail');
+        $router->post('/reset', 'Apis\v1\PasswordController@resetPassword');
+      });
+
       $router->get('/', 'Apis\v1\UsersController@fetch');
       $router->get('/{id}', 'Apis\v1\UsersController@fetchSingle');
       $router->post('/partial', 'Apis\v1\UsersController@findOrCreate');
@@ -67,18 +79,6 @@ $router->group([
           $router->post('/revoke', 'Apis\v1\AccessTokensController@revokeToken');
         });
         $router->post('/refresh', 'Apis\v1\AccessTokensController@refreshToken');
-      });
-
-      $router->group([
-        'prefix' => 'password'
-      ], function() use ($router) {
-        $router->post('/email', 'Apis\v1\PasswordController@sendPasswordResetEmail');
-        $router->post('/reset', 'Apis\v1\PasswordController@resetPassword');
-        $router->group([
-          'middleware' => 'auth:api'
-        ], function() use ($router) {
-          $router->put('/change', 'Apis\v1\PasswordController@changePassword');
-        });
       });
 
       $router->group([
