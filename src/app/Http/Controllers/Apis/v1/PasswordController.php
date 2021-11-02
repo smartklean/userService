@@ -29,7 +29,7 @@ class PasswordController extends Controller
     private $notFoundErrorCode = 'response.codes.not_found_error';
     private $successCode = 'response.codes.success';
     private $isRequiredString = 'required|string|max:255';
-    private $isRequiredCustomString = 'required|string|min:6|max:255|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed';
+    private $isRequiredCustomString = 'required|string|min:6|max:255|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/|confirmed';
     private $isRequiredEmail = 'required|string|email|max:255';
     private $passwordString = 'password';
     private $userAttribute = 'user';
