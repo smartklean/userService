@@ -2,7 +2,12 @@
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
 
-image: cashenvoyng/ceng-aws-deploy-kit:latest
+image:
+  name: 286886851830.dkr.ecr.eu-west-2.amazonaws.com/ceng-aws-deploy-kit:latest
+  aws:
+    access-key: $AWS_ACCESS_KEY_ID
+    secret-key: $AWS_SECRET_ACCESS_KEY
+
 clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
 
