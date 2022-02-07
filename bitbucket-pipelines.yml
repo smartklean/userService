@@ -5,8 +5,7 @@
 image:
   name: 286886851830.dkr.ecr.eu-west-2.amazonaws.com/ceng-aws-deploy-kit:latest
   aws:
-    access-key: $AWS_ACCESS_KEY_ID
-    secret-key: $AWS_SECRET_ACCESS_KEY
+    oidc-role: $AWS_ROLE_ARN
 
 clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
@@ -14,18 +13,18 @@ clone:
 definitions:
   services:
     docker:
-      memory: 2048 
+      memory: 2048
     mysql:
       image: mysql
       environment:
-        MYSQL_DATABASE: 'homestead'
-        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-        MYSQL_USER: 'homestead'
-        MYSQL_PASSWORD: 'secret'
+        MYSQL_DATABASE: "homestead"
+        MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+        MYSQL_USER: "homestead"
+        MYSQL_PASSWORD: "secret"
 
   caches:
-    sonar: ~/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
-  
+    sonar: ~/.sonar/cache # Caching SonarCloud artifacts will speed up your build
+
   steps:
     - step: &build-test-sonarcloud
         name: Build, test and analyze on SonarCloud
@@ -33,7 +32,9 @@ definitions:
           - docker
           - composer
           - sonar
+        oidc: true
         script:
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
           - cd src && composer update && composer --version
           - echo "sonar.php.tests.reportPath=/opt/atlassian/pipelines/agent/build/src/test-reports/phpunit.junit.xml" > sonar-project.properties
           - echo "sonar.php.coverage.reportPaths=/opt/atlassian/pipelines/agent/build/src/test-reports/phpunit.coverage.xml" >> sonar-project.properties
@@ -48,7 +49,9 @@ definitions:
           - mysql
     - step: &check-quality-gate-sonarcloud
         name: Check the Quality Gate on SonarCloud
+        oidc: true
         script:
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
           - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
     - step: &deploy-to-staging
         name: Deploy to Staging
@@ -56,7 +59,9 @@ definitions:
           - docker
           - composer
         deployment: Staging
+        oidc: true
         script:
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
           - cp -r /usr/local/bin/deploykit/* ./ && ls -latr
           - echo "Deploying To Staging Environment"
           - ./appws_deploy.sh Staging Webservice
@@ -68,22 +73,24 @@ definitions:
           - docker
           - composer
         deployment: Production
+        oidc: true
         script:
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
           - echo "Deploying To Production Environment - Coming Soon"
         services:
           - docker
-          
+
 pipelines:
   custom:
     deploy-to-staging:
-     - step: *deploy-to-staging 
-  
+      - step: *deploy-to-staging
+
   branches:
     master:
       - step: *build-test-sonarcloud
       - step: *check-quality-gate-sonarcloud
 
   pull-requests:
-    '**':
+    "**":
       - step: *build-test-sonarcloud
       - step: *check-quality-gate-sonarcloud
