@@ -76,7 +76,9 @@ definitions:
         oidc: true
         script:
           - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
-          - echo "Deploying To Production Environment - Coming Soon"
+          - cp -r /usr/local/bin/deploykit/* ./ && ls -latr
+          - echo "Deploying To Production Environment"
+          - ./appws_deploy.sh Production Webservice
         services:
           - docker
 
@@ -84,6 +86,8 @@ pipelines:
   custom:
     deploy-to-staging:
       - step: *deploy-to-staging
+    deploy-to-production:
+      - step: *deploy-to-production
 
   branches:
     master:
