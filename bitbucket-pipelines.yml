@@ -21,9 +21,10 @@ definitions:
         MYSQL_RANDOM_ROOT_PASSWORD: "yes"
         MYSQL_USER: "homestead"
         MYSQL_PASSWORD: "secret"
-
   caches:
     sonar: ~/.sonar/cache # Caching SonarCloud artifacts will speed up your build
+  setupawsaccess: &setupawsaccess export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
+  predeploy: &predeploy cp -r /usr/local/bin/deploykit/* ./ && ls -latr && echo "Deploying"
 
   steps:
     - step: &build-test-sonarcloud
@@ -34,7 +35,7 @@ definitions:
           - sonar
         oidc: true
         script:
-          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
+          - *setupawsaccess
           - cd src && composer update && composer --version
           - echo "sonar.php.tests.reportPath=/opt/atlassian/pipelines/agent/build/src/test-reports/phpunit.junit.xml" > sonar-project.properties
           - echo "sonar.php.coverage.reportPaths=/opt/atlassian/pipelines/agent/build/src/test-reports/phpunit.coverage.xml" >> sonar-project.properties
@@ -43,7 +44,7 @@ definitions:
           - sed -ir "s/^[#]*\s*${ENV_VAR_PREFIX}TEST_DB_HOST=.*/${ENV_VAR_PREFIX}TEST_DB_HOST=127.0.0.1/" .env
           - php artisan migrate --force --no-interaction -vvv && php artisan passport:install --force
           - ./vendor/bin/phpunit --log-junit ./test-reports/phpunit.junit.xml #--coverage-clover ./test-reports/phpunit.coverage.xml
-          - pipe: sonarsource/sonarcloud-scan:1.2.0
+          - pipe: sonarsource/sonarcloud-scan:1.4.0
           - rm -rf .env .envr sonar-project.properties && cd ..
         services:
           - mysql
@@ -51,8 +52,8 @@ definitions:
         name: Check the Quality Gate on SonarCloud
         oidc: true
         script:
-          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
-          - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
+          - *setupawsaccess
+          - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
     - step: &deploy-to-staging
         name: Deploy to Staging
         caches:
@@ -61,9 +62,8 @@ definitions:
         deployment: Staging
         oidc: true
         script:
-          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
-          - cp -r /usr/local/bin/deploykit/* ./ && ls -latr
-          - echo "Deploying To Staging Environment"
+          - *setupawsaccess
+          - *predeploy
           - ./appws_deploy.sh Staging Webservice
         services:
           - docker
@@ -75,9 +75,8 @@ definitions:
         deployment: Production
         oidc: true
         script:
-          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
-          - cp -r /usr/local/bin/deploykit/* ./ && ls -latr
-          - echo "Deploying To Production Environment"
+          - *setupawsaccess
+          - *predeploy
           - ./appws_deploy.sh Production Webservice
         services:
           - docker
