@@ -27,10 +27,14 @@ class PasswordController extends Controller
     private $notFoundError = 'response.errors.not_found';
     private $errorCode = 'response.codes.error';
     private $notFoundErrorCode = 'response.codes.not_found_error';
+    private $unauthenticatedMessage = 'response.messages.unauthenticated';
+    private $unauthenticatedError = 'response.errors.unauthenticated';
+    private $unauthenticatedErrorCode = 'response.codes.unauthenticated';
     private $successCode = 'response.codes.success';
     private $isRequiredString = 'required|string|max:255';
     private $isRequiredCustomString = 'required|string|min:6|max:255|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/|confirmed';
     private $isRequiredEmail = 'required|string|email|max:255';
+    private $isRequiredInteger = 'required|integer';
     private $passwordString = 'password';
     private $userAttribute = 'user';
     private $userPassword = 'user password';
@@ -73,6 +77,27 @@ class PasswordController extends Controller
               $this->message => __('response.messages.password_email'),
               'token' => $unhashedToken
             ], 200);
+    }
+
+    public function verifyPassword(Request $request){
+      $rules = [
+        'user_id' => $this->isRequiredInteger,
+        'password' => $this->isRequiredString,
+      ];
+
+      $validator =  Validator::make($request->all(), $rules);
+
+      if($validator->fails()){
+        return $this->jsonValidationError($validator);
+      }
+
+      $user = User::find($request->user_id);
+
+      if(!$user){
+        return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+      }
+
+      return Hash::check($request->password, $user->password) ? $this->jsonResponse('OK') : $this->jsonResponse(__($this->unauthenticatedMessage), __($this->unauthenticatedErrorCode), 401, [], __($this->unauthenticatedError));
     }
 
     public function resetPassword(Request $request){
