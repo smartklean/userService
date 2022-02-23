@@ -51,6 +51,7 @@ $router->group([
       $router->group([
         'prefix' => 'password'
       ], function() use ($router) {
+        $router->post('/verify', 'Apis\v1\PasswordController@verifyPassword');
         $router->group([
           'middleware' => 'auth:api'
         ], function() use ($router) {
