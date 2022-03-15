@@ -11,7 +11,7 @@ RUN apt-get update \
     && LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php \
     # Packages to install
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    wget curl vim nano inetutils-ping htop openssh-server git unzip bzip2 locales jq dirmngr gpg-agent \
+    wget curl vim nano inetutils-ping htop openssh-server git unzip bzip2 locales jq dirmngr gpg-agent cron \
     php7.4-fpm php7.4-common php7.4-curl php7.4-mysql \
     php7.4-mbstring php7.4-json php7.4-xml php7.4-bcmath \
     # SSH setup
