@@ -123,7 +123,7 @@ class UsersController extends Controller
           $this->passwordString => $password,
           $this->phoneNumber => $request->input($this->phoneNumber)
         ]);
-  
+
         return (new UserResource($user))
               ->additional([
                 $this->status => true,
@@ -261,7 +261,7 @@ class UsersController extends Controller
       $rules = [
         $this->firstName => $this->isRequiredString,
         $this->lastName => $this->isRequiredString,
-        $this->passwordString => $this->isRequiredString.'|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed',
+        $this->passwordString => $this->isRequiredString.'|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/|confirmed',
         $this->phoneNumber => $this->isRequiredString.'|unique:users,phone_number,'.$user->id
       ];
 
