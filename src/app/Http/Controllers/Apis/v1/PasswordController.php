@@ -32,7 +32,7 @@ class PasswordController extends Controller
     private $unauthenticatedErrorCode = 'response.codes.unauthenticated';
     private $successCode = 'response.codes.success';
     private $isRequiredString = 'required|string|max:255';
-    private $isRequiredCustomString = 'required|string|min:6|max:255|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/|confirmed';
+    private $isRequiredCustomString = 'required|string|min:6|max:255|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/|confirmed';
     private $isRequiredEmail = 'required|string|email|max:255';
     private $isRequiredInteger = 'required|integer';
     private $passwordString = 'password';
