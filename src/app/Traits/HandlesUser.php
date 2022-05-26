@@ -26,9 +26,7 @@ trait HandlesUser
 
     if($request->is_verified == 'true' || $request->is_verified == 'false'){
       foreach ($users as $key => $user) {
-        if($request->is_verified == 'true' && !$user->email_verified_at){
-          $users->forget($key);
-        }else if($request->is_verified == 'false' && $user->email_verified_at){
+        if($request->is_verified == 'true' && !$user->email_verified_at || $request->is_verified == 'false' && $user->email_verified_at){
           $users->forget($key);
         }
       }
