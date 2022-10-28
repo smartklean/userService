@@ -108,7 +108,7 @@ class VerifyOtpController extends Controller
             return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
           }
        //generate otp
-        $unhashedOtp = mt_rand(123456,999999);
+        $unhashedOtp = random_int(123456,999999);
         $otp = Hash::make($unhashedOtp);
         $phone_number_verified = false;
         $user->otp = $otp;
