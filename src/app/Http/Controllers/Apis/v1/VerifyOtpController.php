@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\HandlesJsonResponse;
 use App\Traits\HandlesRequest;
+use Throwable;
+use Illuminate\Support\Facades\Log as Loggable;
 
 class VerifyOtpController extends Controller
 {
