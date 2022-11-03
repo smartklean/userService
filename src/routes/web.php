@@ -92,6 +92,7 @@ $router->group([
         });
         $router->post('/verify', 'Apis\v1\VerifyEmailController@verifyEmail');
       });
+
       $router->group([
         'prefix' => 'otp'
       ], function() use ($router) {
@@ -101,8 +102,7 @@ $router->group([
           $router->post('/send', 'Apis\v1\VerifyOtpController@sendOtp');
           $router->post('/verify', 'Apis\v1\VerifyOtpController@verifyOtp');
         });
-        $router->get('/verify', 'Apis\v1\VerifyOtpController@verifyOtp');
-        $router->get('/send', 'Apis\v1\VerifyOtpController@sendOtp');
+        
       });
     });
   });
