@@ -57,20 +57,15 @@ class VerifyOtpController extends Controller
 
        if(Hash::check($request->otp, $user->otp)){
         try {
-            $res = $this->call('GET', $request, config('businessws.url').'/api/v1/business/'.$request->businessId.'/setting', [
-              'content-type' => 'application/json',
-              'accept' => 'application/json'
-            ]);
-            
-            $setting = json_decode($res->getBody())->data;
-            if(!$setting->sms_enabled){
-                $res = $this->call('GET', $request, config('businessws.url').'/api/v1/business/'.$request->businessId.'/setting/sms', [
-                    'content-type' => 'application/json',
-                    'accept' => 'application/json'
-                  ]);
-                  
-                  $setting = json_decode($res->getBody())->data;
-            }
+            $request->merge([
+                'status'=> true,
+              ]);
+            $res = $this->call('PUT', $request, config('businessws.url').'/api/v1/business/'.$request->businessId.'/sms', [
+                'content-type' => 'application/json',
+                'accept' => 'application/json'
+                ]);
+                $setting = json_decode($res->getBody())->data;
+    
             $user->phone_number_verified = true;
              $user->otp = null;
              $user->save();
@@ -79,11 +74,12 @@ class VerifyOtpController extends Controller
                    ->additional([
                      'status' => true,
                      'code' => __($this->successCode),
-                     'message' => __($this->verifiedMessage, ['attr' => $this->userAttribute])
+                     'message' => __($this->verifiedMessage, ['attr' => 'phone number']),
                    ], 200);
             
           } catch (Throwable $e) {
-            return $this->jsonResponse($e->getMessage(), __($this->errorCode), 500, [], __($this->serverError));
+            Loggable::error($e);
+            return $this->jsonResponse($e->getMessage(), __($this->errorCode), 500, [], __('Something went wrong.'));
           }
              
        }else{
@@ -112,18 +108,10 @@ class VerifyOtpController extends Controller
        //generate otp
         $unhashedOtp = random_int(123456,999999);
         $otp = Hash::make($unhashedOtp);
-        $phone_number_verified = false;
         $user->otp = $otp;
-        $user->phone_number_verified = $phone_number_verified;
+        $user->phone_number_verified = false;
         $user->save();
-
         //send sms 
-       return (new UserResource($user))
-             ->additional([
-               'status' => true,
-               'code' => __($this->successCode),
-               'message' => __($this->otpSentMessage),
-               'otp' => $unhashedOtp
-             ], 200);
+        return $this->jsonResponse('OTP has been sent to your phone number.', 00, 200, $unhashedOtp);
      }
 }
