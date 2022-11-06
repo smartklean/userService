@@ -39,7 +39,6 @@ class VerifyOtpController extends Controller
 
      public function verifyOtp(Request $request){
        $rules = [
-         'user_id' => $this->isRequired,
          'otp' => $this->isRequired
        ];
 
@@ -90,21 +89,12 @@ class VerifyOtpController extends Controller
      }
 
      public function sendOtp(Request $request){
-        $rules = [
-            'user_id' => $this->isRequired,
-          ];
+
+        $user = User::where('id', $request->user_id)->first();
    
-          $validator =  Validator::make($request->all(), $rules);
-   
-          if($validator->fails()){
-            return $this->jsonValidationError($validator);
-          }
-   
-          $user = User::where('id', $request->user_id)->first();
-   
-          if(!$user){
-            return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
-          }
+        if(!$user){
+        return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
+        }
        //generate otp
         $unhashedOtp = random_int(123456,999999);
         $otp = Hash::make($unhashedOtp);
