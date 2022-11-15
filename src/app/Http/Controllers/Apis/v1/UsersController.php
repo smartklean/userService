@@ -235,6 +235,10 @@ class UsersController extends Controller
         $user->email_verified_at = $emailVerifiedAt;
       }
 
+      if(isset($request->phoneNumber) && $request->phoneNumber != $user->phone_number){
+        $user->phone_number_verified = false;
+      }
+
       $user->fill([
         $this->firstName => $request->input($this->firstName) ? $request->input($this->firstName) : $user->first_name,
         $this->lastName => $request->input($this->lastName) ? $request->input($this->lastName) : $user->last_name,
