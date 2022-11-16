@@ -41,7 +41,7 @@ class VerifyOtpController extends Controller
        $rules = [
          'otp' => $this->isRequired
        ];
-
+       
        $validator =  Validator::make($request->all(), $rules);
 
        if($validator->fails()){
