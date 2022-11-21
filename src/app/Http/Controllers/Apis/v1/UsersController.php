@@ -238,7 +238,7 @@ class UsersController extends Controller
         $user->email_verified_at = $emailVerifiedAt;
       }
 
-      if(isset($request->phoneNumber) && $request->phoneNumber != $user->phone_number){
+      if(isset($request->phoneNumber) && ($request->phoneNumber != $user->phone_number)){
         $user->phone_number_verified = false;
         $user->save();
 
