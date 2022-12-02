@@ -55,4 +55,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function setPhoneNumberAttribute($value){
       return $this->attributes['phone_number'] = trim($value);
     }
+
+    public function setOtpAttribute($value){
+      return $this->attributes['otp'] = trim($value);
+    }
+
 }

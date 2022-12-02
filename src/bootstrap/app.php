@@ -65,6 +65,10 @@ $app->singleton(
 
 $app->configure('app');
 
+$app->configure('businessws');
+
+$app->configure('notificationws');
+
 $app->configure('auth');
 
 $app->configure('constants');

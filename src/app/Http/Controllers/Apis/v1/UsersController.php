@@ -13,10 +13,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\HandlesUser;
 use App\Traits\HandlesJsonResponse;
+use App\Traits\HandlesRequest;
+use Throwable;
+use Illuminate\Support\Facades\Log as Loggable;
 
 class UsersController extends Controller
 {
-    use HandlesUser, HandlesJsonResponse;
+    use HandlesUser, HandlesJsonResponse, HandlesRequest;
     /**
      * Create a new controller instance.
      *
@@ -233,6 +236,25 @@ class UsersController extends Controller
 
         $user->email_verification_code = $emailVerificationCode;
         $user->email_verified_at = $emailVerifiedAt;
+      }
+
+      if(isset($request->phone_number) && ($request->phone_number != $user->phone_number)){
+        $user->phone_number_verified = false;
+        $user->save();
+
+        try {
+          $request->merge([
+              'status'=> false,
+            ]);
+          $res = $this->call('PUT', $request, config('businessws.url').'/api/v1/business/'.$request->businessId.'/sms', [
+              'content-type' => 'application/json',
+              'accept' => 'application/json'
+              ]);
+          
+        } catch (Throwable $e) {
+          Loggable::error($e);
+          return $this->jsonResponse($e->getMessage(), __($this->errorCode), 500, [], __('Something went wrong.'));
+        }
       }
 
       $user->fill([
