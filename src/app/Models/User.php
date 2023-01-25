@@ -20,7 +20,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'email_verification_code', 'email_verified_at', 'password', 'phone_number',
+        'first_name',
+        'last_name',
+        'email',
+        'email_verification_code',
+        'email_verified_at',
+        'otp',
+        'otp_created_at',
+        'password',
+        'phone_number',
+        'phone_number_verified',
     ];
 
     /**
@@ -29,7 +38,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password', 'email_verification_code'
+        'password', 'otp', 'otp_created_at', 'email_verification_code'
     ];
 
     public function getFirstNameAttribute($value){
