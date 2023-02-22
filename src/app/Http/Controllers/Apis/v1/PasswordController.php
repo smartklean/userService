@@ -11,6 +11,7 @@ use App\Http\Resources\User as UserResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserPasswordRest;
 use App\Traits\HandlesJsonResponse;
 
 class PasswordController extends Controller
@@ -137,7 +138,7 @@ class PasswordController extends Controller
                   $token->delete();
                 }
   
-                return (new UserResource($user))
+                return (new UserPasswordRest($user))
                     ->additional([
                       $this->status => true,
                       'code' => __($this->successCode),
