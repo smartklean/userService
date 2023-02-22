@@ -69,6 +69,8 @@ $app->configure('businessws');
 
 $app->configure('notificationsws');
 
+$app->configure('authorizationws');
+
 $app->configure('auth');
 
 $app->configure('constants');

@@ -50,6 +50,11 @@ class UsersController extends Controller
     private $status = 'status';
     private $message = 'message';
 
+    private $headerType = 'application/json';
+    private $authorizationServiceUrl = 'authorizationws.url';
+    private $roleAndPermissionEndpoint = '/api/v1/authorization/user';
+
+
     public function fetchUserInstance(Request $request){
       return (new UserResource($request->user()))
             ->additional([
@@ -80,6 +85,14 @@ class UsersController extends Controller
       if(!$user){
         return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
       }
+
+      //fetch role
+      $res = $this->call('GET', new Request([]), config($this->authorizationServiceUrl).$this->roleAndPermissionEndpoint.'/'.$user->id.'/role', ['Content-Type' =>$this->headerType, 'Accept' => $this->headerType]);
+      $user->roles = $res->json()['data'];
+
+      //fetch permission
+      $res = $this->call('GET', new Request([]), config($this->authorizationServiceUrl).$this->roleAndPermissionEndpoint.'/'.$user->id.'/permission', ['Content-Type' =>$this->headerType, 'Accept' => $this->headerType]);
+      $user->permissions = $res->json()['data'];
 
       return (new UserResource($user))
             ->additional([
