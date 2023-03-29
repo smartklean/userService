@@ -1,5 +1,5 @@
 <?php
 
 return [
-  'url' => env('GATEWAYWS_AUTHORIZATIONWS_URL', 'host.docker.internal'),
+  'url' => env('USERSWS_AUTHORIZATIONWS_URL', 'host.docker.internal'),
 ];
