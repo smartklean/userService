@@ -250,7 +250,7 @@ class UsersController extends Controller
               'content-type' => 'application/json',
               'accept' => 'application/json'
               ]);
-          
+
         } catch (Throwable $e) {
           Loggable::error($e);
           return $this->jsonResponse($e->getMessage(), __($this->errorCode), 500, [], __('Something went wrong.'));
@@ -283,7 +283,7 @@ class UsersController extends Controller
       $rules = [
         $this->firstName => $this->isRequiredString,
         $this->lastName => $this->isRequiredString,
-        $this->passwordString => $this->isRequiredString.'|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/|confirmed',
+        $this->passwordString => $this->isRequiredString.'|regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+_!@#$%^&*.,?])[A-Za-z\d\-+_!@#$%^&*.,?]{8,}$/|confirmed',
         $this->phoneNumber => $this->isRequiredString.'|unique:users,phone_number,'.$user->id
       ];
 
