@@ -11,6 +11,7 @@ use App\Http\Resources\User as UserResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserPasswordRest;
 use App\Traits\HandlesJsonResponse;
 
 class PasswordController extends Controller
@@ -23,7 +24,7 @@ class PasswordController extends Controller
      */
 
     private $error = 'response.errors.request';
-    private $notFoundMessage = 'response.messages.not_found';
+    private $notFoundMessage = 'response.messages.user_not_found';
     private $notFoundError = 'response.errors.not_found';
     private $errorCode = 'response.codes.error';
     private $notFoundErrorCode = 'response.codes.not_found_error';
@@ -125,21 +126,29 @@ class PasswordController extends Controller
 
         if(isset($token) && Hash::check($request->input('token'), $token->token)){
             if(strtotime('-15 minutes') - strtotime(DB::table('password_resets')->where(['email' => $user->email])->first()->created_at) < 0){
-              $user->password = Hash::make($request->input('password'));
-              $user->save();
+              //check the old one against the new one
 
-              $token = DB::table('password_resets')->where(['email' => $user->email]);
+              if(!Hash::check($request->input('password'), $user->password)){
+                $user->password = Hash::make($request->input('password'));
+                $user->save();
 
-              if($token->first() !== null){
-                $token->delete();
-              }
+                $token = DB::table('password_resets')->where(['email' => $user->email]);
 
-              return (new UserResource($user))
+                if($token->first() !== null){
+                  $token->delete();
+                }
+  
+                return (new UserPasswordRest($user))
                     ->additional([
                       $this->status => true,
                       'code' => __($this->successCode),
                       $this->message => __('response.messages.password_reset')
                     ], 200);
+
+              }
+
+              return $this->jsonResponse(__('response.messages.password_check'), __($this->errorCode), 400, [], __($this->error));
+             
             }
         }
 
