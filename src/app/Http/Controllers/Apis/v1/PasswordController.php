@@ -41,6 +41,7 @@ class PasswordController extends Controller
     private $userPassword = 'user password';
     private $oldPassword = 'old_password';
     private $newPassword = 'new_password';
+    private $isMobile = 'is_mobile';
     private $updatedMessage = 'response.messages.updated';
     private $notValidMessage = 'response.messages.not_valid';
     private $status = 'status';
@@ -55,7 +56,14 @@ class PasswordController extends Controller
         return $this->jsonResponse(__($this->notFoundMessage, ['attr' => $this->userAttribute]), __($this->notFoundErrorCode), 404, [], __($this->notFoundError));
       }
 
-      $token = str_shuffle(uniqid().uniqid());
+      if(!empty($request->input($this->isMobile))){
+
+        $token = random_int(123456,999999);
+
+      }else {
+
+        $token = str_shuffle(uniqid().uniqid());
+      }
 
       $unhashedToken = $token;
 

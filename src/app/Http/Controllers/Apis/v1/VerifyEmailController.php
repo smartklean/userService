@@ -33,6 +33,7 @@ class VerifyEmailController extends Controller
      private $notFoundErrorCode = 'response.codes.not_found_error';
      private $userAttribute = 'user';
      private $isRequiredEmail = 'required|string|email|max:255';
+     private $isMobile = 'is_mobile';
 
      public function verifyEmail(Request $request){
        $rules = [
@@ -76,7 +77,13 @@ class VerifyEmailController extends Controller
      public function resendVerificationCode(Request $request){
        $user = $request->user();
 
-       $unhashedEmailVerificationCode = str_shuffle(uniqid().uniqid());
+       if(!empty($request->input($this->isMobile))){
+
+        $unhashedEmailVerificationCode = random_int(123456,999999);
+
+      }else {
+        $unhashedEmailVerificationCode = str_shuffle(uniqid().uniqid());
+      }
 
        $emailVerificationCode = Hash::make($unhashedEmailVerificationCode);
 
