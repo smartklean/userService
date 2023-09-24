@@ -23,13 +23,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'first_name',
         'last_name',
         'email',
-        'email_verification_code',
         'email_verified_at',
-        'otp',
-        'otp_created_at',
         'password',
         'phone_number',
-        'phone_number_verified',
     ];
 
     /**
@@ -65,8 +61,5 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
       return $this->attributes['phone_number'] = trim($value);
     }
 
-    public function setOtpAttribute($value){
-      return $this->attributes['otp'] = trim($value);
-    }
 
 }

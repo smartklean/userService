@@ -22,13 +22,13 @@ $router->get('/', function() {
         'data' => [
           'key' => 'base64:'.base64_encode(Illuminate\Support\Str::random(32)),
         ],
-        'message' => 'Welcome to CashEnvoy!'
+        'message' => 'Welcome to Sample Application!'
       ], 200);
     }
 
     return response()->json([
       'status' => true,
-      'message' => 'Welcome to CashEnvoy!'
+      'message' => 'Hooray welcome onboard!'
     ], 200);
 });
 
@@ -63,8 +63,7 @@ $router->group([
 
       $router->get('/', 'Apis\v1\UsersController@fetch');
       $router->get('/{id}', 'Apis\v1\UsersController@fetchSingle');
-      $router->post('/partial', 'Apis\v1\UsersController@findOrCreate');
-      $router->put('/partial/{id}', 'Apis\v1\UsersController@updatePartialUser');
+      $router->get('/wallet/{userId}', 'Apis\v1\UsersController@fetchUserWallet');
       $router->put('/{id}', 'Apis\v1\UsersController@update');
       $router->post('/', 'Apis\v1\UsersController@store');
       $router->delete('/{id}', 'Apis\v1\UsersController@destroy');
@@ -81,29 +80,7 @@ $router->group([
         });
         $router->post('/refresh', 'Apis\v1\AccessTokensController@refreshToken');
       });
-
-      $router->group([
-        'prefix' => 'email'
-      ], function() use ($router) {
-        $router->group([
-          'middleware' => 'auth:api'
-        ], function() use ($router) {
-          $router->post('/resend', 'Apis\v1\VerifyEmailController@resendVerificationCode');
-        });
-        $router->post('/verify', 'Apis\v1\VerifyEmailController@verifyEmail');
-      });
       
-      $router->group([
-        'prefix' => 'otp'
-      ], function() use ($router) {
-        $router->group([
-          'middleware' => 'auth:api'
-        ], function() use ($router) {
-          $router->post('/send', 'Apis\v1\VerifyOtpController@sendOtp');
-          $router->post('/verify', 'Apis\v1\VerifyOtpController@verifyOtp');
-        });
-
-      });
     });
   });
   /* Version 1 */
